@@ -2,6 +2,10 @@
 
 <a href="{% url 'page:create' %}">Add new page</a>
 
+{% if last_modified is not None %}
 <ul>
-	<li><a href=""></a></li>
+	{% for last_modified_page in last_modified %}
+		<li><a href="{% url 'page:show' page_id=last_modified_page.id %}">{{last_modified_page.title}}</a></li>
+	{% endfor %}
 </ul>
+{% endif %}

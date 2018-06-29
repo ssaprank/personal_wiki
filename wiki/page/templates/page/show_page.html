@@ -1,0 +1,18 @@
+<header class="article_header">{{article_title}}</header>
+<br/>
+{% autoescape off %}
+{{page_object.html}}
+{% endautoescape %}
+<br/>
+<br/>
+<footer>
+	<p>
+		Created: {{page_object.created}}
+	</p>
+	<p>
+		Last modified: {{page_object.last_modified}}
+	</p>
+	<a href="{% url 'page:edit' page_id=page_object.id %}">Edit this page</a>
+	<br>
+	<a href="{% url 'page:index' %}">Back to main page</a>
+</footer>

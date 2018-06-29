@@ -1,0 +1,24 @@
+{% if page_form.instance.id is not None %}
+<form method="POST" action="{% url 'page:edit' page_id=page_form.instance.id %}">
+{% else %}
+<form method="POST" action="{% url 'page:create' %}">
+{% endif %}
+	{% csrf_token %}
+	{{page_form.title.label}} : &nbsp;
+	{{page_form.title}}
+	<br/>
+	<br/>
+	{{page_form.html.label}} : &nbsp;
+	{{page_form.html}}
+	<br/>
+	{{page_form.tags.label}} : &nbsp;
+	{{page_form.tags}} (Write tags as a single string divided by commas)
+	<br/>
+	<br/>
+	<br/>
+	<input type="submit" name="submit"/>
+</form>
+
+{% if form_errors is not None %}
+	{{form_errors}}
+{% endif %}
