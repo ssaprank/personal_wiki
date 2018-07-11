@@ -8,6 +8,7 @@ class Article(models.Model):
 	tags = models.CharField(max_length = 256, blank=True, null=True)
 	created = models.DateTimeField(auto_now_add=True)
 	last_modified = models.DateTimeField(auto_now_add=True)
+	work_in_progress = models.BooleanField(blank=True, default=True)
 
 	def __str__(self):
 		return "Title : '%s'" % self.title
@@ -18,4 +19,4 @@ class ArticleForm(ModelForm):
 		widgets = {
 			'html': Textarea(attrs={'cols' : '80', 'rows' : '50'})
 		}
-		fields = ['title', 'html', 'tags']
+		fields = ['title', 'html', 'tags', 'work_in_progress']

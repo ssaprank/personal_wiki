@@ -1,24 +1,47 @@
-{% if page_form.instance.id is not None %}
-<form method="POST" action="{% url 'page:edit' page_id=page_form.instance.id %}">
-{% else %}
-<form method="POST" action="{% url 'page:create' %}">
-{% endif %}
-	{% csrf_token %}
-	{{page_form.title.label}} : &nbsp;
-	{{page_form.title}}
-	<br/>
-	<br/>
-	{{page_form.html.label}} : &nbsp;
-	{{page_form.html}}
-	<br/>
-	{{page_form.tags.label}} : &nbsp;
-	{{page_form.tags}} (Write tags as a single string divided by commas)
-	<br/>
-	<br/>
-	<br/>
-	<input type="submit" name="submit"/>
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+	{% load static %}
+	<script type="text/javascript" src="{% static 'page/jquery-3.3.1.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'page/create_page_script.js' %}"></script>
+</head>
+<body>
+	{% if page_form.instance.id is not None %}
+	<form method="POST" action="{% url 'page:edit' page_id=page_form.instance.id %}">
+	{% else %}
+	<form method="POST" action="{% url 'page:create' %}">
+	{% endif %}
+		{% csrf_token %}
+		{{page_form.title.label}} : &nbsp;
+		{{page_form.title}}
+		<br/>
+		<br/>
+		{{page_form.html.label}} : &nbsp;
+		{{page_form.html}}
+		<br/>
+		<div class="button_row" style="margin-left: 20px">
+			<input type="button" class="add_tag_button" name="add_p_tag" value="<p>"/>
+			<input type="button" class="add_tag_button" name="add_ul_tag" value="<ul>"/>
+			<input type="button" class="add_tag_button" name="add_li_tag" value="<li>"/>
+			<input type="button" class="add_tag_button" name="add_h1_tag" value="<h1>"/>
+			<input type="button" class="add_tag_button" name="add_h2_tag" value="<h2>"/>
+			<input type="button" class="add_tag_button" name="add_b_tag" value="<b>"/>
+			<input type="button" class="add_tag_button" name="add_i_tag" value="<i>"/>
+		</div>
+		<br/>
+		{{page_form.tags.label}} : &nbsp;
+		{{page_form.tags}} (Write tags as a single string divided by commas)
+		<br/>
+		<br/>
+		<br/>
+		{{page_form.work_in_progress.label}} : &nbsp;
+		{{page_form.work_in_progress}}
+		<br/>
+		<input type="submit" name="submit"/>
+	</form>
 
-{% if form_errors is not None %}
-	{{form_errors}}
-{% endif %}
+	{% if form_errors is not None %}
+		{{form_errors}}
+	{% endif %}
+</body>
+</html>

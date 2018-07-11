@@ -1,5 +1,5 @@
-<header class="article_header">{{article_title}}</header>
-<br/>
+<header class="article_header">{{ page_object.title }}</header>
+<hr>
 {% autoescape off %}
 {{page_object.html}}
 {% endautoescape %}
@@ -12,7 +12,14 @@
 	<p>
 		Last modified: {{page_object.last_modified}}
 	</p>
+	{% if page_object.tags is not None %}
+	<p>
+		Tags: {% for tag in page_object.tags %} {{ tag }} {% endfor %}
+	</p>
+	{% endif %}
 	<a href="{% url 'page:edit' page_id=page_object.id %}">Edit this page</a>
 	<br>
 	<a href="{% url 'page:index' %}">Back to main page</a>
+	<br>
+	<a href="{% url 'page:delete' page_id=page_object.id %}">Delete page</a>
 </footer>
