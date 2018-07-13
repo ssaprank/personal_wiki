@@ -1,5 +1,18 @@
+{% load static %}
+<script type="text/javascript" src="{% static 'page/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'page/jquery-ui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'page/index_page.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'page/jquery-ui.min.css' %}">
+
 <h1> {{ greeting }} </h1>
 
+<div class="ui-widget">
+	<label for="page_tag_search">Search by tag:</label>
+	<input name="page_tag_search" id="page_tag_search" />
+</div>
+
+<br/>
+<br/>
 <a href="{% url 'page:create' %}">Add new page</a>
 
 {% if last_modified is not None %}

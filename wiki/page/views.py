@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import Article, ArticleForm
 
 import datetime
+import json
 
 def index(request):
 	template_name = 'page/index.html'
@@ -15,10 +16,20 @@ def index(request):
 	render_params = {"greeting" : "hello", "last_modified" : last_five_modified}
 	return render(request, template_name, render_params)
 
+def show_list_by_tag(request):
+	if request.is_ajax:
+		tag = request.GET.get('term', '')
+		template_name = 'page/index.html'
+
+		pages = Article.objects.filter(work_in_progress=False,tags__icontains=tag).order_by('-last_modified')[:5]
+
+		render_params = {"greeting" : "HUJ", "last_modified" : pages}
+		return render(request, template_name, render_params)
+	else:
+		return redirect('page:index')
+
 def show_page(request, page_id):
 	page_object = get_object_or_404(Article, id = page_id)
-	if page_object.tags is not None:
-		page_object.tags = page_object.tags.split(",")
 	template_name = 'page/show_page.html'
 	render_params = {"page_object" : page_object}
 	return render(request, template_name, render_params)
@@ -58,3 +69,19 @@ def create_page(request):
 def delete_page(request, page_id):
 	Article.objects.filter(id=page_id).delete()
 	return redirect('page:index')
+
+def get_page_tags(request):
+	mimetype = 'application/json'
+	if request.is_ajax():
+		search_query = request.GET.get('term', '').replace(",", "")
+		pages = Article.objects.filter(tags__icontains = search_query)[:5]
+		results = []
+		for page in pages:
+			tags = (tag for tag in page.tags.split(",") if tag not in results and search_query in tag)
+			for tag in tags:
+				results.append(tag)
+		data = json.dumps(results)
+	else:
+		data = 'fail'
+	return HttpResponse(data, mimetype)
+
