@@ -40,8 +40,15 @@
 		<input type="submit" name="submit"/>
 	</form>
 
-	{% if form_errors is not None %}
-		{{form_errors}}
-	{% endif %}
+	<br>
+	<a href="{% url 'page:index' %}">Back to main page</a>
+	<br>
+
+{% if form_errors is not None %}
+	{% for field in page_form %}
+		{{ field.errors }}
+	{% endfor %}
+{% endif %}
+
 </body>
 </html>

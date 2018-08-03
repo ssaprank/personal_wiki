@@ -1,0 +1,5 @@
+{% if pages is not None %}
+	{% for page in pages %}
+		<li><a href="{% url 'page:show' page_id=page.id %}">{{page.title}}</a></li>
+	{% endfor %}
+{% endif %}

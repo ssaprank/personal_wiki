@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.core import serializers
 
 from .models import Article, ArticleForm
 
@@ -11,19 +12,26 @@ import json
 def index(request):
 	template_name = 'page/index.html'
 	
-	last_five_modified = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:5]
+	pages = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:5]
 
-	render_params = {"greeting" : "hello", "last_modified" : last_five_modified}
+	render_params = {"greeting" : "hello", "pages" : pages}
 	return render(request, template_name, render_params)
 
-def show_list_by_tag(request):
-	if request.is_ajax:
-		tag = request.GET.get('term', '')
-		template_name = 'page/index.html'
+def show_search_list(request):
+	if request.is_ajax():
+		element = request.GET.get('search_element', '')
+		term = request.GET.get('term', '')
+		template_name = 'page/page_list.html'
 
-		pages = Article.objects.filter(work_in_progress=False,tags__icontains=tag).order_by('-last_modified')[:5]
+		if term != '':
+			if element == 'tag':
+				pages = Article.objects.filter(work_in_progress=False,tags__icontains=term).order_by('-last_modified')[:5]
+			elif element == 'title':
+				pages = Article.objects.filter(work_in_progress=False,title__icontains=term).order_by('-last_modified')[:5]
+		else:
+			pages = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:5]
 
-		render_params = {"greeting" : "HUJ", "last_modified" : pages}
+		render_params = {"pages" : pages}
 		return render(request, template_name, render_params)
 	else:
 		return redirect('page:index')
@@ -31,6 +39,8 @@ def show_list_by_tag(request):
 def show_page(request, page_id):
 	page_object = get_object_or_404(Article, id = page_id)
 	template_name = 'page/show_page.html'
+	if page_object.tags is not None:
+		page_object.tags = page_object.tags.split(',')
 	render_params = {"page_object" : page_object}
 	return render(request, template_name, render_params)
 

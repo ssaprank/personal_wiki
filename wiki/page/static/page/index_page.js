@@ -13,7 +13,23 @@ $( document ).ready(function() {
 		}
 	});
 
+	$("#page_title_search").keyup(function(e) {
+		if (e.keyCode == 13) {
+			$.get(
+			"api/get_search_pages/",
+			{'search_element': 'title', 'term': $(event.target).val()},
+			  function(data){
+			  	$('#page_list').html(data);
+			  });
+		}
+	});
+
 	function AutocompleteSelectedHandler(event) {
-		$.get("api/get_pages_by_tag/", JSON.stringify($(event.target).val()));
+		$.get(
+			"api/get_search_pages/",
+			{'search_element': 'tag', 'term': $(event.target).val()},
+			  function(data){
+			  	$('#page_list').html(data);
+			  });
 	}
 });

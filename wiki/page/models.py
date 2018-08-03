@@ -11,7 +11,13 @@ class Article(models.Model):
 	work_in_progress = models.BooleanField(blank=True, default=True)
 
 	def __str__(self):
-		return "Title : '%s'" % self.title
+		string = "Title : '%s'\nCreated: %s\n" % (self.title, self.created)
+		if self.tags is not None:
+			for tag in self.tags.split(','):
+				string+="Tag: %s\n" % tag
+		string += "WIP: " + ("yes" if self.work_in_progress == True else "No")
+
+		return string + "\n\n"
 
 class ArticleForm(ModelForm):
 	class Meta:
