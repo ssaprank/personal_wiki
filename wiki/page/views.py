@@ -8,6 +8,7 @@ from .models import Article, ArticleForm
 
 import datetime
 import json
+import operator
 
 def index(request):
 	template_name = 'page/index.html'
@@ -20,16 +21,18 @@ def index(request):
 def show_search_list(request):
 	if request.is_ajax():
 		element = request.GET.get('search_element', '')
-		term = request.GET.get('term', '')
+		tag_term = request.GET.get('tag_term', '')
+		title_term = request.GET.get('title_term', '')
 		template_name = 'page/page_list.html'
 
-		if term != '':
-			if element == 'tag':
-				pages = Article.objects.filter(work_in_progress=False,tags__icontains=term).order_by('-last_modified')[:5]
-			elif element == 'title':
-				pages = Article.objects.filter(work_in_progress=False,title__icontains=term).order_by('-last_modified')[:5]
-		else:
-			pages = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:5]
+		filters = {'work_in_progress' : False}
+
+		if tag_term != '':
+			filters['tags__icontains'] = tag_term
+		if title_term != '':
+			filters['title__icontains'] = title_term
+
+		pages = Article.objects.filter(**filters).order_by('-last_modified')[:5]
 
 		render_params = {"pages" : pages}
 		return render(request, template_name, render_params)
