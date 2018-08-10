@@ -1,9 +1,11 @@
+"""Handles url resolving and naming"""
 from django.urls import path, re_path
 
 from . import views
 
-app_name = 'page'
-urlpatterns = [
+app_name = 'page' #pylint: disable=invalid-name
+
+urlpatterns = [ #pylint: disable=invalid-name
     path('', views.index, name='index'),
     path('<int:page_id>/edit', views.edit_page, name='edit'),
     path('<int:page_id>/', views.show_page, name='show'),

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 
-from .models import Article
+from ..models import Article
 from datetime import timedelta
 
 class ArticleTestCase(TestCase):
