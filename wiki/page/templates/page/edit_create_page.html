@@ -20,15 +20,21 @@
 		{{page_form.html}}
 		<br/>
 		<div class="button_row" style="margin-left: 20px">
-			<input type="button" class="add_tag_button" name="add_p_tag" value="<p>"/>
-			<input type="button" class="add_tag_button" name="add_ul_tag" value="<ul>"/>
-			<input type="button" class="add_tag_button" name="add_li_tag" value="<li>"/>
-			<input type="button" class="add_tag_button" name="add_h1_tag" value="<h1>"/>
-			<input type="button" class="add_tag_button" name="add_h2_tag" value="<h2>"/>
-			<input type="button" class="add_tag_button" name="add_b_tag" value="<b>"/>
-			<input type="button" class="add_tag_button" name="add_i_tag" value="<i>"/>
+			<!-- I want to display the most used html tags as a row of buttons-->
+			<!-- The rest will be available for insertion via a dropdown menu -->
+			{% for tag in html_tag_row %}
+					<input type="button" class="add_tag_button" name="add_{{tag}}_tag" value="<{{tag}}>"/>			  
+			{% endfor %}
+			{% if html_tag_list is not None %}
+			<select id="html_tag_list">
+				<option value="0">--More Tags--</option>
+				{% for tag in html_tag_list %}
+					<option value="{{tag}}">&lt;{{tag}}&gt;</option>
+				{% endfor %}
+			</select>
+			{% endif %}
+			<input type="button" id="html_view_toggle" value="Switch to view" />
 		</div>
-		<br/>
 		{{page_form.tags.label}} : &nbsp;
 		{{page_form.tags}} (Write tags as a single string divided by commas)
 		<br/>

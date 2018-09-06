@@ -2,6 +2,7 @@
 Contains views of the page module
 """
 import json
+import os
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -9,6 +10,8 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from .models import Article, ArticleForm
+
+html_tag_row = ['a', 'b', 'h1', 'h5', 'i', 'strong']
 
 def index(request):
 	"""Main view - list all pages"""
@@ -52,6 +55,7 @@ def show_page(request, page_id):
 def edit_page(request, page_id):
 	"""Returns view that allows to edit page by its ID"""
 	page_object = get_object_or_404(Article, id=page_id)
+	storage_class = get_storage_class(settings.STATICFILES_STORAGE)
 	template_name = 'page/edit_create_page.html'
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST, instance=page_object)
@@ -70,6 +74,8 @@ def edit_page(request, page_id):
 def create_page(request):
 	""" Renders view for creating a new page """
 	template_name = 'page/edit_create_page.html'
+	file_path = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
+	html_tag_list = list(map(lambda s: s.replace("\n",""), open(file_path, 'r').readlines()))
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST)
 		if page_form.is_valid():
@@ -77,10 +83,10 @@ def create_page(request):
 			return redirect('page:index')
 		else:
 			form_errors = page_form.errors
-			return render(request, template_name, {"page_form" : page_form, "form_errors" : form_errors})
+			return render(request, template_name, {"page_form" : page_form, "form_errors" : form_errors, "html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row})
 	else:
 		page_form = ArticleForm()
-		render_params = {"page_form" : page_form}
+		render_params = {"page_form" : page_form, "html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
 		return render(request, template_name, render_params)
 
 def delete_page(request, page_id): # pylint: disable=unused-argument
