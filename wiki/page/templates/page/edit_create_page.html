@@ -6,6 +6,9 @@
 	<script type="text/javascript" src="{% static 'page/create_page_script.js' %}"></script>
 </head>
 <body>
+	{% if name is not None %}
+		{{name}}
+	{% endif %}
 	{% if page_form.instance.id is not None %}
 	<form method="POST" action="{% url 'page:edit' page_id=page_form.instance.id %}">
 	{% else %}
@@ -16,8 +19,9 @@
 		{{page_form.title}}
 		<br/>
 		<br/>
-		{{page_form.html.label}} : &nbsp;
-		{{page_form.html}}
+		<div id="html_wrapper">
+			{{page_form.html}}
+		</div>
 		<br/>
 		<div class="button_row" style="margin-left: 20px">
 			<!-- I want to display the most used html tags as a row of buttons-->
@@ -34,10 +38,11 @@
 			</select>
 			{% endif %}
 			<input type="button" id="html_view_toggle" value="Switch to view" />
+			<input type="file" id="html_upload_image" name="html_upload_image" value="Upload image" />
 		</div>
+		<br/>
 		{{page_form.tags.label}} : &nbsp;
 		{{page_form.tags}} (Write tags as a single string divided by commas)
-		<br/>
 		<br/>
 		<br/>
 		{{page_form.work_in_progress.label}} : &nbsp;
@@ -45,7 +50,6 @@
 		<br/>
 		<input type="submit" name="submit"/>
 	</form>
-
 	<br>
 	<a href="{% url 'page:index' %}">Back to main page</a>
 	<br>

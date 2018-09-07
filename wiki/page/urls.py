@@ -12,5 +12,6 @@ urlpatterns = [ #pylint: disable=invalid-name
     path('create', views.create_page, name='create'),
     path('<int:page_id>/delete', views.delete_page, name='delete'),
     re_path(r'^api/get_page_tags/', views.get_page_tags, name='get_page_tags'),
-    re_path(r'^api/get_search_pages/', views.show_search_list, name='show_search_list')
+    re_path(r'^api/get_search_pages/', views.show_search_list, name='show_search_list'),
+    re_path(r'^api/upload_image/', views.upload_image, name='upload_image'),
 ]

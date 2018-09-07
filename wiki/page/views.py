@@ -8,10 +8,13 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.core.files.storage import FileSystemStorage
 
-from .models import Article, ArticleForm
+from .models import Article, ArticleForm, Image
 
 html_tag_row = ['a', 'b', 'h1', 'h5', 'i', 'strong']
+file_path = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
+html_tag_list = list(map(lambda s: s.replace("\n",""), open(file_path, 'r').readlines()))
 
 def index(request):
 	"""Main view - list all pages"""
@@ -55,8 +58,8 @@ def show_page(request, page_id):
 def edit_page(request, page_id):
 	"""Returns view that allows to edit page by its ID"""
 	page_object = get_object_or_404(Article, id=page_id)
-	storage_class = get_storage_class(settings.STATICFILES_STORAGE)
 	template_name = 'page/edit_create_page.html'
+	render_params = {"html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST, instance=page_object)
 		if page_form.is_valid():
@@ -64,29 +67,28 @@ def edit_page(request, page_id):
 			page_form.save()
 			return redirect('page:index')
 		else:
-			form_errors = page_form.errors
-			return render(request, template_name, {"page_form" : page_form, "form_errors" : form_errors})
+			render_params['page_form'] = page_form
+			render_params['form_errors'] = page_form.errors
+			return render(request, template_name, render_params)
 	else:
-		page_form = ArticleForm(instance=page_object)
-		render_params = {"page_form" : page_form}
+		render_params['page_form'] = ArticleForm(instance=page_object)
 		return render(request, template_name, render_params)
 
 def create_page(request):
 	""" Renders view for creating a new page """
 	template_name = 'page/edit_create_page.html'
-	file_path = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
-	html_tag_list = list(map(lambda s: s.replace("\n",""), open(file_path, 'r').readlines()))
+	render_params = {"html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST)
 		if page_form.is_valid():
 			page_form.save()
 			return redirect('page:index')
 		else:
-			form_errors = page_form.errors
-			return render(request, template_name, {"page_form" : page_form, "form_errors" : form_errors, "html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row})
+			render_params['page_form'] = page_form
+			render_params['form_errors'] = page_form.errors
+			return render(request, template_name, render_params)
 	else:
-		page_form = ArticleForm()
-		render_params = {"page_form" : page_form, "html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
+		render_params['page_form'] = ArticleForm()
 		return render(request, template_name, render_params)
 
 def delete_page(request, page_id): # pylint: disable=unused-argument
@@ -112,3 +114,24 @@ def get_page_tags(request):
 	else:
 		data = 'fail'
 	return HttpResponse(data, mimetype)
+
+def upload_image(request):
+	"""View used to upload user images later used in articles"""
+	if request.is_ajax():
+		template_name = 'page/edit_create_page.html'
+		render_params = {"html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
+		image = request.POST.get('image')
+		#render_params['page_form'] = ArticleForm(request.POST)
+
+		if image is not None:
+			fs = FileSystemStorage()
+			filename = fs.save(image.name, image)
+			image_url = fs.url(filename)
+			image_object = Image(title=filename, image=image)
+			image_object.save()
+			render_params['name'] = filename
+		return render(request, template_name, render_params)
+	else:
+		return redirect('page:index')
+
+

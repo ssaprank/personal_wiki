@@ -21,6 +21,10 @@ class Article(models.Model):
 
 		return string + "\n\n"
 
+class Image(models.Model):
+	title = models.CharField(max_length=100)
+	image = models.FileField(upload_to='images')
+
 class ArticleForm(ModelForm):
 	"""Represents a Form for Article model"""
 	class Meta:
