@@ -3,14 +3,16 @@ Contains views of the page module
 """
 import json
 import os
+import base64
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 
-from .models import Article, ArticleForm, Image
+from .models import Article, ArticleForm, Image, ImageForm
 
 html_tag_row = ['a', 'b', 'h1', 'h5', 'i', 'strong']
 file_path = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
@@ -78,6 +80,8 @@ def create_page(request):
 	""" Renders view for creating a new page """
 	template_name = 'page/edit_create_page.html'
 	render_params = {"html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
+	render_params['images'] = Image.objects.all()
+	render_params['base_dir'] = settings.BASE_DIR
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST)
 		if page_form.is_valid():
@@ -116,22 +120,13 @@ def get_page_tags(request):
 	return HttpResponse(data, mimetype)
 
 def upload_image(request):
-	"""View used to upload user images later used in articles"""
-	if request.is_ajax():
-		template_name = 'page/edit_create_page.html'
-		render_params = {"html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
-		image = request.POST.get('image')
-		#render_params['page_form'] = ArticleForm(request.POST)
-
-		if image is not None:
-			fs = FileSystemStorage()
-			filename = fs.save(image.name, image)
-			image_url = fs.url(filename)
-			image_object = Image(title=filename, image=image)
-			image_object.save()
-			render_params['name'] = filename
-		return render(request, template_name, render_params)
+	"""
+	Handles uploading images in edit_create_page
+	"""
+	form = ImageForm(request.POST, request.FILES)
+	if form.is_valid():
+		image = form.save()
+		data = {'is_valid' : True, 'url' : image.image.url}
 	else:
-		return redirect('page:index')
-
-
+		data = {'is_valid' : False}
+	return JsonResponse(data)

@@ -23,7 +23,13 @@ class Article(models.Model):
 
 class Image(models.Model):
 	title = models.CharField(max_length=100)
-	image = models.FileField(upload_to='images')
+	image = models.ImageField(upload_to='images/')
+	uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class ImageForm(ModelForm):
+	class Meta:
+		model = Image
+		fields = ('image', )
 
 class ArticleForm(ModelForm):
 	"""Represents a Form for Article model"""
