@@ -1,115 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-	{% load static %}
-	<script type="text/javascript" src="{% static 'page/js/jquery-3.3.1.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'page/js/bootstrap.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'page/custom_js/create_page_script.js' %}"></script>
-	<script src="{% static 'page/js/jquery.ui.widget.js' %}"></script>
-	<script src="{% static 'page/js/jquery.iframe-transport.js' %}"></script>
-	<script src="{% static 'page/js/jquery.fileupload.js' %}"></script>
-	<link href="{% static 'page/css/bootstrap.min.css' %}" rel="stylesheet">
+    {% load static %}
+    <script type="text/javascript" src="{% static 'page/js/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'page/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'page/custom_js/create_page_script.js' %}"></script>
+    <script src="{% static 'page/js/jquery.ui.widget.js' %}"></script>
+    <script src="{% static 'page/js/jquery.iframe-transport.js' %}"></script>
+    <script src="{% static 'page/js/jquery.fileupload.js' %}"></script>
+    <link href="{% static 'page/css/bootstrap.min.css' %}" rel="stylesheet">
 </head>
 <body>
-	{% if name is not None %}
-		{{name}}
-	{% endif %}
-	{% if page_form.instance.id is not None %}
-	<form method="POST" action="{% url 'page:edit' page_id=page_form.instance.id %}">
-	{% else %}
-	<form method="POST" action="{% url 'page:create' %}">
-	{% endif %}
-		{% csrf_token %}
-		{{page_form.title.label}} : &nbsp;
-		{{page_form.title}}
-		<br/>
-		<br/>
-		<div id="html_wrapper">
-			{{page_form.html}}
-		</div>
-		<br/>
-		<div class="button_row" style="margin-left: 20px">
-			<!-- I want to display the most used html tags as a row of buttons-->
-			<!-- The rest will be available for insertion via a dropdown menu -->
-			{% for tag in html_tag_row %}
-					<input type="button" class="add_tag_button" name="add_{{tag}}_tag" value="<{{tag}}>"/>			  
-			{% endfor %}
-			{% if html_tag_list is not None %}
-			<select id="html_tag_list">
-				<option value="0">--More Tags--</option>
-				{% for tag in html_tag_list %}
-					<option value="{{tag}}">&lt;{{tag}}&gt;</option>
-				{% endfor %}
-			</select>
-			{% endif %}
-			<input type="button" id="html_view_toggle" value="Switch to view" />
-			<!--<input type="file" id="html_upload_image" name="html_upload_image" value="Upload image" />-->
-			{# button to trigger the action #}
-			<button type="button" class="btn btn-primary js-upload-photos">
-  				<span class="glyphicon glyphicon-cloud-upload"></span> Upload images
-			</button>
-
-			{# 2. FILE INPUT TO BE USED BY THE PLUG-IN #}
-			<input id="fileupload" type="file" name="image" multiple
-       			style="display: none;"
-       			data-url="{% url 'page:upload_image' %}"
-       			data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'/>
-
-       			<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-  Insert Images
-</button>
-
-<!-- Modal -->
-<div class="modal bg-dark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-      	{# STUB - LOAD UPLOADED IMAGES HERE #}
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-		</div>
-
-{% if images is not None %}
-<p>Is not none</p>
-{% for image in images %}
-<img src="{{image.image.url}}" />
-{% endfor %}
+{% if name is not None %}
+{{name}}
 {% endif %}
+{% if page_form.instance.id is not None %}
+<form method="POST" action="{% url 'page:edit' page_id=page_form.instance.id %}">
+    {% else %}
+    <form method="POST" action="{% url 'page:create' %}">
+        {% endif %}
+        {% csrf_token %}
+        {{page_form.title.label}} : &nbsp;
+        {{page_form.title}}
+        <br/>
+        <br/>
+        <div id="html_wrapper">
+            {{page_form.html}}
+        </div>
+        <br/>
+        <div class="button_row" id="edit_page_button_row" style="margin-left: 20px">
+            <!-- I want to display the most used html tags as a row of buttons-->
+            <!-- The rest will be available for insertion via a dropdown menu -->
+            {% for tag in html_tag_row %}
+            <input type="button" class="add_tag_button" name="add_{{tag}}_tag" value="<{{tag}}>"/>
+            {% endfor %}
+            {% if html_tag_list is not None %}
+            <select id="html_tag_list">
+                <option value="0">--More Tags--</option>
+                {% for tag in html_tag_list %}
+                <option value="{{tag}}">&lt;{{tag}}&gt;</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+            <!--<input type="file" id="html_upload_image" name="html_upload_image" value="Upload image" />-->
+            {# button to trigger the action #}
+            <button type="button" class="btn btn-primary js-upload-photos">
+                <span class="glyphicon glyphicon-cloud-upload"></span> Upload images
+            </button>
 
-		<br/>
-		{{page_form.tags.label}} : &nbsp;
-		{{page_form.tags}} (Write tags as a single string divided by commas)
-		<br/>
-		<br/>
-		{{page_form.work_in_progress.label}} : &nbsp;
-		{{page_form.work_in_progress}}
-		<br/>
-		<input type="submit" name="submit"/>
-	</form>
-	<br>
-	<a href="{% url 'page:index' %}">Back to main page</a>
-	<br>
+            {# 2. FILE INPUT TO BE USED BY THE PLUG-IN #}
+            <input id="fileupload" type="file" name="image" multiple
+                   style="display: none;"
+                   data-url="{% url 'page:upload_image' %}"
+                   data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'/>
 
-{% if form_errors is not None %}
-	{% for field in page_form %}
-		{{ field.errors }}
-	{% endfor %}
-{% endif %}
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#imagesInsertionModal">
+                Insert Images
+            </button>
+
+            <!-- Bootstrap Modal -->
+            <div class="modal bg-dark" id="imagesInsertionModal" tabindex="-1" role="dialog" aria-labelledby="imagesInsertionModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="imagesInsertionModalLabel">Modal title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {% if images is not None %}
+                            	{% for image in images %}
+                            		<input type="image" src="{{image.image.url}}" id="insert_image_{{image.id}}" width="200"/>
+                            	{% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="button_row" style="margin-left: 20px">
+        	<input type="button" id="html_view_toggle" value="Switch to view"/>
+        </div>
+
+        <br/>
+        {{page_form.tags.label}} : &nbsp;
+        {{page_form.tags}} (Write tags as a single string divided by commas)
+        <br/>
+        <br/>
+        {{page_form.work_in_progress.label}} : &nbsp;
+        {{page_form.work_in_progress}}
+        <br/>
+        <input type="submit" name="submit"/>
+    </form>
+    <br>
+    <a href="{% url 'page:index' %}">Back to main page</a>
+    <br>
+
+    {% if form_errors is not None %}
+    {% for field in page_form %}
+    {{ field.errors }}
+    {% endfor %}
+    {% endif %}
 
 </body>
 

@@ -46,6 +46,7 @@ $( document ).ready(function() {
             let viewarea = $('#html_wrapper');
             viewarea.html(textarea);            
             obj.val('Switch to view');
+            $("#edit_page_button_row").show();
         } else {
             textarea = $('#id_html');
             let viewarea = $('#html_wrapper');
@@ -54,6 +55,7 @@ $( document ).ready(function() {
             viewarea.width(width);
             viewarea.height(height);
             viewarea.html(textarea.val());
+            $("#edit_page_button_row").hide();
             obj.val('Switch to html');
         }
     });
@@ -80,6 +82,17 @@ $( document ).ready(function() {
                 alert("There was an error uploading your images");
             }
         }
+    });
+
+    $("[id^=insert_image]").click(function(e) {
+        e.preventDefault();
+        let textarea = $("#id_html");
+        let imageUrl = $(this).prop("src");
+        let htmlString = '<img src="' + imageUrl + '" />';
+        let value = textarea.val();
+        textarea.val(value + htmlString);
+        $('#imagesInsertionModal').modal('hide');
+        textarea.focus();
     });
 
     function insertTag(tag)
