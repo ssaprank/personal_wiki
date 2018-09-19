@@ -1,0 +1,16 @@
+atomicwrites==1.1.5
+attrs==18.1.0
+Django==2.1.1
+django-mptt==0.8.7
+django-polymorphic==2.0.3
+django-static-jquery==2.1.4
+easy-thumbnails==2.5
+more-itertools==4.3.0
+pathlib2==2.3.2
+Pillow==5.2.0
+pluggy==0.7.1
+py==1.5.4
+pytest==3.7.1
+pytz==2018.4
+six==1.11.0
+Unidecode==0.4.21
