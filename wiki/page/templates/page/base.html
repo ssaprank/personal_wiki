@@ -1,0 +1,28 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="{% static 'page/js/jquery-3.3.1.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'page/js/jquery-ui.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'page/custom_js/index_page.js' %}"></script>
+		<script type="text/javascript" src="{% static 'page/js/bootstrap.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'page/custom_js/create_page_script.js' %}"></script>
+		<script src="{% static 'page/js/jquery.ui.widget.js' %}"></script>
+		<script src="{% static 'page/js/jquery.iframe-transport.js' %}"></script>
+		<script src="{% static 'page/js/jquery.fileupload.js' %}"></script>
+		<link rel="stylesheet" type="text/css" href="{% static 'page/css/jquery-ui.min.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'page/css/custom.css' %}">
+		<link href="{% static 'page/css/bootstrap.min.css' %}" rel="stylesheet">
+	</head>
+	<body>
+		<div class="container-fluid" id="base_container">
+			<div class="row" id="base_background_image_row">
+				<img id="base_background_image" src="{% static 'page/images/base_theme.jpg' %}" />
+			</div>
+			<div class="content" id="content_container">
+				{% block content %}
+				{% endblock %}
+			</div>
+		</div>
+	</body>
+</html>

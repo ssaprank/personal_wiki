@@ -4,6 +4,7 @@ Contains views of the page module
 import json
 import os
 import base64
+import re
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
@@ -13,6 +14,7 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 
 from .models import Article, ArticleForm, Image, ImageForm
+from .helpers import WikiStringHelper
 
 html_tag_row = ['a', 'b', 'h1', 'h5', 'i', 'strong']
 file_path = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
@@ -20,9 +22,12 @@ html_tag_list = list(map(lambda s: s.replace("\n",""), open(file_path, 'r').read
 
 def index(request):
 	"""Main view - list all pages"""
-	template_name = 'page/index.html'
+	template_name = 'page/home.html'
 
 	pages = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:5]
+
+	for page in pages:
+		page.short_description = WikiStringHelper.get_article_short_description(page.html, 50)
 
 	render_params = {"greeting" : "hello", "pages" : pages}
 	return render(request, template_name, render_params)
@@ -42,6 +47,9 @@ def show_search_list(request):
 			filters['title__icontains'] = title_term
 
 		pages = Article.objects.filter(**filters).order_by('-last_modified')[:5]
+
+		for page in pages:
+			page.short_description = WikiStringHelper.get_article_short_description(page.html, 50)
 
 		render_params = {"pages" : pages}
 		return render(request, template_name, render_params)

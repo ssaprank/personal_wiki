@@ -1,0 +1,46 @@
+html, body {
+	margin: 0px;
+	padding: 0px;
+	background: #fff;
+	background-repeat: repeat;
+	background-image: url('./../images/background.jpeg');
+}
+
+#base_background_image_row {
+	margin-top: 10px;
+
+}
+
+#base_background_image {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 90%;
+}
+
+#greeting_header {
+	text-align: center;
+	color: #C0C0C0
+}
+
+#content_container {
+	padding: 20px;
+	margin-top: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 90%;
+	background: #FFF;
+}
+
+a.backspace_link {
+	font-size: 20px;
+}
+
+.list_article_title {
+	font-size: 30px;
+	text-decoration: underline;
+}
+
+#add_new_page_button {
+	font-size: 30px;
+}

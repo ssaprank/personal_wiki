@@ -1,25 +1,50 @@
-<header class="article_header">{{ page_object.title }}</header>
-<hr>
+{% extends './base.html' %}
+
+{% block content %}
+<div class=" row mt-lg-2 article_header">
+	<div class="col">
+	{{ page_object.title }}
+	<hr>
+	</div>	
+</div>
+<div class=" row mt-lg-2 article_header">
+	<div class="col">
 {% autoescape off %}
 {{page_object.html}}
 {% endautoescape %}
-<br/>
-<br/>
-<footer>
-	<p>
+</div>
+</div>
+<div class="row mt-lg-2">
+	<div class="col">
+
 		Created: {{page_object.created}}
-	</p>
-	<p>
+</div>
+		
+	<div class="col">
+
 		Last modified: {{page_object.last_modified}}
-	</p>
+</div>
+</div>
+
+
 	{% if page_object.tags is not None %}
-	<p>
+	<div class="row mt-lg-2">
+	<div class="col">
 		Tags: {% for tag in page_object.tags %} {{ tag }} {% endfor %}
-	</p>
+</div>
+</div>
+
 	{% endif %}
-	<a href="{% url 'page:edit' page_id=page_object.id %}">Edit this page</a>
-	<br>
-	<a href="{% url 'page:index' %}">Back to main page</a>
-	<br>
-	<a href="{% url 'page:delete' page_id=page_object.id %}">Delete page</a>
-</footer>
+	<div class=" row mt-lg-2">
+	<div class="col sm-2">
+	<a class="badge badge-primary" href="{% url 'page:edit' page_id=page_object.id %}">Edit this page</a>
+	</div>	
+	<div class="col sm-1">
+	<a class="badge badge-secondary" href="{% url 'page:index' %}">Back to main page</a>
+	</div>	
+	<div class="col sm-1">
+	<a class="badge badge-danger" href="{% url 'page:delete' page_id=page_object.id %}">Delete page</a>	<hr>
+	</div>	
+</div>
+
+{% endblock %}

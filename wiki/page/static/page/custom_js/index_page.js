@@ -35,4 +35,10 @@ $( document ).ready(function() {
 
 		$.get("api/get_search_pages/", data, function(data) { $('#page_list').html(data); });
 	}
+
+	$("#add_page_button").click(function(e) {
+		$.get("create");
+	});
+
+
 });

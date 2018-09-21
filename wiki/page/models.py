@@ -1,6 +1,6 @@
 """Holds models of the page module"""
 from django.db import models
-from django.forms import ModelForm, Textarea
+from django.forms import ModelForm, Textarea, TextInput
 
 class Article(models.Model):
 	"""Represents an Article"""
@@ -36,5 +36,11 @@ class ArticleForm(ModelForm):
 	class Meta:
 		""" Holds Metadata for ArticleForm class """
 		model = Article
-		widgets = {'html': Textarea(attrs={'cols' : '80', 'rows' : '50'})}
+		widgets = {
+			'html': Textarea(attrs={'cols' : '80', 'rows' : '20', 'class' : 'form-control'}),
+			'title' : TextInput(attrs={'class' : 'form-control'})
+		}
 		fields = ['title', 'html', 'tags', 'work_in_progress']
+		labels = {
+			'html' : 'Write your Article',
+		}
