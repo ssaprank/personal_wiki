@@ -85,8 +85,9 @@
         </div>
         <div class="row mt-lg-4">
         	<div class="col">
-        		{{page_form.tags.label}} (divide by commas) : &nbsp;
-        		{{page_form.tags}}
+        		Tags (divide by commas) : &nbsp;
+        		{% for tag in page_form.tag.all %}{{ tag }}<br/>{% endfor %}
+        		<!--<input type="text" name="tags" class="form-control-sm" required="" maxlength="256" id="id_tags">-->
         	</div>
         	<div class="col">
         		{{page_form.work_in_progress.label}} : &nbsp;

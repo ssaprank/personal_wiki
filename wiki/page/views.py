@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 
-from .models import Article, ArticleForm, Image, ImageForm
+from .models import Article, ArticleForm, Image, ImageForm, Tag
 from .helpers import WikiStringHelper
 
 html_tag_row = ['a', 'b', 'h1', 'h5', 'i', 'strong']
@@ -42,7 +42,7 @@ def show_search_list(request):
 		filters = {'work_in_progress' : False}
 
 		if tag_term != '':
-			filters['tags__icontains'] = tag_term
+			filters['tag__name__icontains'] = tag_term
 		if title_term != '':
 			filters['title__icontains'] = title_term
 
@@ -60,8 +60,8 @@ def show_page(request, page_id):
 	"""Show page by id"""
 	page_object = get_object_or_404(Article, id=page_id)
 	template_name = 'page/show_page.html'
-	if page_object.tags is not None:
-		page_object.tags = page_object.tags.split(',')
+	if page_object.tag_set is not None:
+		page_object.tags = page_object.tag_set
 	render_params = {"page_object" : page_object}
 	return render(request, template_name, render_params)
 
@@ -115,13 +115,11 @@ def get_page_tags(request):
 	"""
 	mimetype = 'application/json'
 	if request.is_ajax():
-		search_query = request.GET.get('term', '').replace(",", "")
-		pages = Article.objects.filter(tags__icontains=search_query)[:5]
+		search_query = request.GET.get('term', '')
+		tags = Tag.objects.filter(name__icontains=search_query)
 		results = []
-		for page in pages:
-			tags = (tag for tag in page.tags.split(",") if tag not in results and search_query in tag)
-			for tag in tags:
-				results.append(tag)
+		for tag in tags:
+			results.append(tag)
 		data = json.dumps(results)
 	else:
 		data = 'fail'

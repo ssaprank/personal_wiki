@@ -2,3 +2,4 @@ bin/
 lib/
 htmlcov/
 \.coverage
+__pycache__/
