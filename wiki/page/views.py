@@ -60,8 +60,6 @@ def show_page(request, page_id):
 	"""Show page by id"""
 	page_object = get_object_or_404(Article, id=page_id)
 	template_name = 'page/show_page.html'
-	if page_object.tag_set is not None:
-		page_object.tags = page_object.tag_set
 	render_params = {"page_object" : page_object}
 	return render(request, template_name, render_params)
 
@@ -70,6 +68,8 @@ def edit_page(request, page_id):
 	page_object = get_object_or_404(Article, id=page_id)
 	template_name = 'page/edit_create_page.html'
 	render_params = {"html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
+	render_params['images'] = Image.objects.all()
+	render_params['base_dir'] = settings.BASE_DIR
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST, instance=page_object)
 		if page_form.is_valid():
@@ -116,10 +116,10 @@ def get_page_tags(request):
 	mimetype = 'application/json'
 	if request.is_ajax():
 		search_query = request.GET.get('term', '')
-		tags = Tag.objects.filter(name__icontains=search_query)
+		tags = Tag.objects.filter(name__icontains=search_query).only('name')
 		results = []
 		for tag in tags:
-			results.append(tag)
+			results.append(tag.name)
 		data = json.dumps(results)
 	else:
 		data = 'fail'
@@ -136,3 +136,10 @@ def upload_image(request):
 	else:
 		data = {'is_valid' : False}
 	return JsonResponse(data)
+
+def set_page_tag(request):
+	"""
+	gets page id and tag name
+	checks whether tag exists: if not creates it
+	checks whether tag is already bound to this page: if not bounds it
+	"""

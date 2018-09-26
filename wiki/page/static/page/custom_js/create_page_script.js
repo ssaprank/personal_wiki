@@ -1,7 +1,6 @@
 $( document ).ready(function() {
-    console.log( "ready!" );
-
     var textarea;
+
     function getCookie(name) {
         var cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -84,7 +83,7 @@ $( document ).ready(function() {
         }
     });
 
-    $("[id^=insert_image]").click(function(e) {
+    $(".insert_image").click(function(e) {
         e.preventDefault();
         let textarea = $("#id_html");
         let imageUrl = $(this).prop("src");
@@ -121,4 +120,22 @@ $( document ).ready(function() {
         textarea.prop("selectionStart", newCaretPosition);
         textarea.prop("selectionEnd", newCaretPosition);
     }
+
+    $("#id_tags").autocomplete({
+        source: "api/get_page_tags",
+        minLength: 2,
+    });
+
+    $("#id_tags").keyup(function(e) {
+        if (e.keyCode == 13) {
+            // on pressing enter - add to page tags container div its name and a button that will delete it
+            tagName = $(this).val();
+            html = tagName + '<button type="button" class="btn btn-danger" id="remove_page_tag_' + tagName + '">X</button>';
+            $("#page_tags_container").html(html);
+            $("#page_tags_container").show();
+            $(this).val() = "";
+        }
+    });
+
+
 });

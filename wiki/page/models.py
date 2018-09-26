@@ -1,6 +1,6 @@
 """Holds models of the page module"""
 from django.db import models
-from django.forms import ModelForm, Textarea, TextInput
+from django.forms import ModelForm, Textarea, TextInput, ModelMultipleChoiceField
 
 class Article(models.Model):
 	"""Represents an Article"""
@@ -43,3 +43,14 @@ class ArticleForm(ModelForm):
 		labels = {
 			'html' : 'Write your Article',
 		}
+
+	tags = ModelMultipleChoiceField(queryset=Tag.objects.all())
+
+	# Provide initial data for 'tags' field
+	def __init__(self, *args, **kwargs):
+	# In case we build the form from an instance (if not, 'tags'are empty)
+		if kwargs.get('instance'):
+			initial = kwargs.setdefault('initial', {})
+			initial['tags'] = [t.pk for t in kwargs['instance'].tag_set.all()]
+
+		ModelForm.__init__(self, *args, **kwargs)
