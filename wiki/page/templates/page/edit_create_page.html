@@ -84,14 +84,6 @@
             <div class="col">
                 <input type="button" id="html_view_toggle" value="Switch to view" class="btn btn-primary"/>
             </div>
-        </div>
-        <div class="row mt-lg-4">
-            <div class="col">
-                Add tag: <input type="text" class="form-control-sm" name="tags" id="id_tags"/>
-            </div>
-            <div class="col">
-                <div id="page_tags_container" hidden></div>
-            </div>
             <div class="col">
                 {{page_form.work_in_progress.label}} : &nbsp;
                 {{page_form.work_in_progress}}
@@ -99,6 +91,8 @@
         </div>
         <div class="row mt-lg-5">
             <div class="col-sm-3">
+            	<!--Used to preserve tags in case page wasn't saved successfully-->
+            	<input type="hidden" name="hidden_page_tags_input" id="hidden_page_tags_input" value="{{page_associated_tags}}"/>
                 <input type="submit" name="submit" class="btn btn-primary"/>
             </div>
             <div class="col">
@@ -111,4 +105,20 @@
     {{ field.errors }}
     {% endfor %}
     {% endif %}
+    <div class="row mt-lg-4">
+    	<div class="col">
+    		Add tag: <input type="text" class="form-control-sm" name="tags" id="id_tags"/>
+    	</div>
+    	<div class="col">
+    		<div id="page_tags_container">
+    			{% for tag in page_tags %}
+            		<div id="page_tag_name_{{tag.name}}">
+            			<span>{{tag.name}}</span>
+            			<button type="button" class="btn btn-danger remove_page_tag" id="remove_page_tag_{{tag.name}}">X</button>
+            		</div>
+    			{% endfor %}
+    		</div>
+    	</div>
+    </div>
     {% endblock %}
+

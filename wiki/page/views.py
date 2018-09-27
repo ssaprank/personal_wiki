@@ -16,9 +16,9 @@ from django.conf import settings
 from .models import Article, ArticleForm, Image, ImageForm, Tag
 from .helpers import WikiStringHelper
 
-html_tag_row = ['a', 'b', 'h1', 'h5', 'i', 'strong']
-file_path = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
-html_tag_list = list(map(lambda s: s.replace("\n",""), open(file_path, 'r').readlines()))
+HTML_TAG_ROW = ['a', 'b', 'h1', 'h5', 'i', 'strong']
+HTML_TAGS_FILE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
+HTML_TAG_LIST = list(map(lambda s: s.replace("\n", ""), open(HTML_TAGS_FILE_PATH, 'r').readlines()))
 
 def index(request):
 	"""Main view - list all pages"""
@@ -67,40 +67,112 @@ def edit_page(request, page_id):
 	"""Returns view that allows to edit page by its ID"""
 	page_object = get_object_or_404(Article, id=page_id)
 	template_name = 'page/edit_create_page.html'
-	render_params = {"html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
+	render_params = {"html_tag_list" : HTML_TAG_LIST, "html_tag_row" : HTML_TAG_ROW}
 	render_params['images'] = Image.objects.all()
 	render_params['base_dir'] = settings.BASE_DIR
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST, instance=page_object)
+		hidden_tags_input = request.POST.get('hidden_page_tags_input', '')
+
 		if page_form.is_valid():
 			page_form.instance.last_modified = timezone.now()
-			page_form.save()
+			new_form = page_form.save()
+			current_article = Article.objects.get(pk=new_form.pk)
+
+			if hidden_tags_input is not None:
+				for tag in hidden_tags_input.split(','):
+					# if tag already exists
+					existing_tag = Tag.objects.get(name=tag)
+					if existing_tag is not None:
+						# if tag is already associated with page do nothing
+						if existing_tag.articles.get(pk=new_form.pk) is not None:
+							pass
+						else:
+							existing_tag.articles.add(current_article)
+					else:
+						# create new tag and append article to it
+						new_tag = Tag(name=tag)
+						new_tag.save()
+						new_tag.articles.add(current_article)
+
+			# now check if tags that are associated with page are not presented in hidden_tags_input
+			page_tags = Tag.objects.filter(articles__id=new_form.pk)
+			page_object = Article.objects.get(id=new_form.pk)
+
+			hidden_tags_input_list = hidden_tags_input.split(",")
+
+			for page_tag in page_tags:
+				if page_tag.name not in hidden_tags_input_list:
+					page_object.tag_set.remove(page_tag)
+					if page_tag.articles.all().count() == 0:
+						page_tag.delete()
+
 			return redirect('page:index')
 		else:
+			render_params['page_associated_tags'] = hidden_tags_input
 			render_params['page_form'] = page_form
 			render_params['form_errors'] = page_form.errors
+
+			if hidden_tags_input:
+				render_params['page_tags'] = hidden_tags_input.split(',')
+				render_params['page_associated_tags'] = hidden_tags_input
+
 			return render(request, template_name, render_params)
 	else:
+		render_params['page_tags'] = Tag.objects.filter(articles__id=page_object.id)
 		render_params['page_form'] = ArticleForm(instance=page_object)
+		render_params['page_associated_tags'] = ""
+
+		for tag_object in render_params['page_tags']:
+			render_params['page_associated_tags'] += tag_object.name + ","
+
+		render_params['page_associated_tags'] = render_params['page_associated_tags'][:-1]
+
 		return render(request, template_name, render_params)
 
 def create_page(request):
 	""" Renders view for creating a new page """
 	template_name = 'page/edit_create_page.html'
-	render_params = {"html_tag_list" : html_tag_list, "html_tag_row" : html_tag_row}
+	render_params = {"html_tag_list" : HTML_TAG_LIST, "html_tag_row" : HTML_TAG_ROW}
 	render_params['images'] = Image.objects.all()
 	render_params['base_dir'] = settings.BASE_DIR
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST)
+
 		if page_form.is_valid():
-			page_form.save()
+			new_form = page_form.save()
+			new_article = Article.objects.get(pk=new_form.pk)
+
+			hidden_tags_input = request.POST.get('hidden_page_tags_input', '')
+
+			if hidden_tags_input is not None:
+				for tag in hidden_tags_input.split(','):
+					# if tag already exists
+					existing_tag = Tag.objects.get(name=tag)
+					if existing_tag is not None:
+						# if tag is already associated with page do nothing
+						if existing_tag.articles.get(pk=new_form.pk) is not None:
+							pass
+						else:
+							existing_tag.articles.add(new_article)
+					else:
+						# create new tag and append article to it
+						new_tag = Tag(name=tag)
+						new_tag.save()
+						new_tag.articles.add(new_article)
+
 			return redirect('page:index')
 		else:
 			render_params['page_form'] = page_form
 			render_params['form_errors'] = page_form.errors
+			hidden_tags_input = request.POST.get('hidden_page_tags_input', '')
+			if hidden_tags_input:
+				render_params['page_tags'] = hidden_tags_input.split(',')
+				render_params['page_associated_tags'] = hidden_tags_input
 			return render(request, template_name, render_params)
 	else:
 		render_params['page_form'] = ArticleForm()
+		render_params['page_tags'] = {}
 		return render(request, template_name, render_params)
 
 def delete_page(request, page_id): # pylint: disable=unused-argument
@@ -143,3 +215,5 @@ def set_page_tag(request):
 	checks whether tag exists: if not creates it
 	checks whether tag is already bound to this page: if not bounds it
 	"""
+	#if request.is_ajax():
+	pass

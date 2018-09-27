@@ -25,10 +25,12 @@
 		Last modified: {{page_object.last_modified}}
 </div>
 </div>
-	{% if page_object.tag.all is not None %}
+
+
+	{% if page_object.tag_set.all.count %}
 	<div class="row mt-lg-2">
 	<div class="col">
-		Tags: {% for tag in page_object.tags.all %} {{ tag }} {% endfor %}
+		Tags: {% for tag in page_object.tag_set.all %} {{ tag.name }} {% endfor %}
 </div>
 </div>
 

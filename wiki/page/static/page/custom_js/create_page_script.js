@@ -1,6 +1,8 @@
 $( document ).ready(function() {
     var textarea;
 
+    bindRemovePageTagEventListener();
+
     function getCookie(name) {
         var cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -129,13 +131,37 @@ $( document ).ready(function() {
     $("#id_tags").keyup(function(e) {
         if (e.keyCode == 13) {
             // on pressing enter - add to page tags container div its name and a button that will delete it
-            tagName = $(this).val();
-            html = tagName + '<button type="button" class="btn btn-danger" id="remove_page_tag_' + tagName + '">X</button>';
-            $("#page_tags_container").html(html);
+            let tagName = $(this).val();
+            let html = '<div id="page_tag_name_' + tagName + '"><span>' + tagName + ' </span><button type="button" class="btn btn-danger remove_page_tag" id="remove_page_tag_' + tagName + '">X</button></div>';
+            $("#page_tags_container").html($("#page_tags_container").html() + html);
             $("#page_tags_container").show();
-            $(this).val() = "";
+            
+            let hiddenInputVal = $("#hidden_page_tags_input").val();
+            
+            if (hiddenInputVal == "") {
+                $("#hidden_page_tags_input").val(tagName)
+            } else {
+                $("#hidden_page_tags_input").val(hiddenInputVal + "," + tagName)
+            }
+
+            bindRemovePageTagEventListener();
+
+            console.log($("#hidden_page_tags_input").val());
+            $(this).val("");
         }
     });
 
+    function bindRemovePageTagEventListener() {
+        $("button.remove_page_tag").click(function(e) {
+            let tagName = $(this).attr('id').replace("remove_page_tag_","");
+            let hiddenInputValue = $("#hidden_page_tags_input").val(); 
 
+            let regex = /(^\,)($\,)/;
+            $("#page_tag_name_" + tagName).remove();
+
+            hiddenInputValue = hiddenInputValue.replace(tagName, "").replace(",,",",").replace(/^\,|\,$/,"");
+
+            $("#hidden_page_tags_input").val(hiddenInputValue);                
+        });
+    }
 });

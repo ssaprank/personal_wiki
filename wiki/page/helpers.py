@@ -1,6 +1,7 @@
-import re
+""" Contains helper classes and methods for the page app """
 
 class WikiStringHelper:
+	""" Contains functions for handling string-related cases """
 	def get_article_short_description(html, pure_length):
 		"""
 		Gets an html string and calculates the length for short description
@@ -8,7 +9,6 @@ class WikiStringHelper:
 		"""
 		pure_length_used = 0
 		full_length = 0
-		is_tag = False
 		open_tag = False
 		short_description = ''
 
@@ -17,12 +17,10 @@ class WikiStringHelper:
 
 		while pure_length_used <= pure_length:
 			if html[full_length] is '<':
-				is_tag = True
 				open_tag = True
 			elif html[full_length] is '>':
 				if html[full_length - 1] is '/':
 					open_tag = False
-				is_tag = False
 			else:
 				pure_length_used += 1
 			full_length += 1

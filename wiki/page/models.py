@@ -25,6 +25,16 @@ class Tag(models.Model):
 	name = models.CharField(max_length=100, unique=True)
 	articles = models.ManyToManyField(Article)
 
+	def __str__(self):
+		string = "Name : %s" % (self.name)
+		
+		if self.articles.all().count() > 0:
+			string += " Articles:"
+			for article in self.articles.all():
+				string += article.title
+
+		return string
+
 class ImageForm(ModelForm):
 	class Meta:
 		model = Image
@@ -44,13 +54,13 @@ class ArticleForm(ModelForm):
 			'html' : 'Write your Article',
 		}
 
-	tags = ModelMultipleChoiceField(queryset=Tag.objects.all())
+	#tags = ModelMultipleChoiceField(queryset=Tag.objects.all())
 
 	# Provide initial data for 'tags' field
-	def __init__(self, *args, **kwargs):
+	#def __init__(self, *args, **kwargs):
 	# In case we build the form from an instance (if not, 'tags'are empty)
-		if kwargs.get('instance'):
-			initial = kwargs.setdefault('initial', {})
-			initial['tags'] = [t.pk for t in kwargs['instance'].tag_set.all()]
+		#if kwargs.get('instance'):
+			#initial = kwargs.setdefault('initial', {})
+			#initial['tags'] = [t.pk for t in kwargs['instance'].tag_set.all()]
 
-		ModelForm.__init__(self, *args, **kwargs)
+		#ModelForm.__init__(self, *args, **kwargs)
