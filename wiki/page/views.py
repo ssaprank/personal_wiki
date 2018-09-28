@@ -25,11 +25,12 @@ def index(request):
 	template_name = 'page/home.html'
 
 	pages = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:5]
+	wip_pages = Article.objects.filter(work_in_progress=True)
 
 	for page in pages:
 		page.short_description = WikiStringHelper.get_article_short_description(page.html, 50)
 
-	render_params = {"greeting" : "hello", "pages" : pages}
+	render_params = {"greeting" : "hello", "pages" : pages, 'wip_pages' : wip_pages}
 	return render(request, template_name, render_params)
 
 def show_search_list(request):
@@ -82,8 +83,8 @@ def edit_page(request, page_id):
 			if hidden_tags_input is not None:
 				for tag in hidden_tags_input.split(','):
 					# if tag already exists
-					existing_tag = Tag.objects.get(name=tag)
-					if existing_tag is not None:
+					if Tag.objects.filter(name=tag).count() > 0:
+						existing_tag = Tag.objects.get(name=tag)
 						# if tag is already associated with page do nothing
 						if existing_tag.articles.get(pk=new_form.pk) is not None:
 							pass
@@ -119,6 +120,7 @@ def edit_page(request, page_id):
 
 			return render(request, template_name, render_params)
 	else:
+		print("non post request")
 		render_params['page_tags'] = Tag.objects.filter(articles__id=page_object.id)
 		render_params['page_form'] = ArticleForm(instance=page_object)
 		render_params['page_associated_tags'] = ""
@@ -139,7 +141,7 @@ def create_page(request):
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST)
 
-		if page_form.is_valid():
+		if page_form.is_valid():				
 			new_form = page_form.save()
 			new_article = Article.objects.get(pk=new_form.pk)
 
@@ -148,8 +150,8 @@ def create_page(request):
 			if hidden_tags_input is not None:
 				for tag in hidden_tags_input.split(','):
 					# if tag already exists
-					existing_tag = Tag.objects.get(name=tag)
-					if existing_tag is not None:
+					if Tag.objects.filter(name=tag).count() > 0:
+						existing_tag = Tag.objects.get(name=tag)
 						# if tag is already associated with page do nothing
 						if existing_tag.articles.get(pk=new_form.pk) is not None:
 							pass
@@ -188,10 +190,11 @@ def get_page_tags(request):
 	mimetype = 'application/json'
 	if request.is_ajax():
 		search_query = request.GET.get('term', '')
-		tags = Tag.objects.filter(name__icontains=search_query).only('name')
+		tags = Tag.objects.filter(name__icontains=search_query)
 		results = []
 		for tag in tags:
-			results.append(tag.name)
+			if tag.articles.filter(work_in_progress=False).count() > 0:
+				results.append(tag.name)
 		data = json.dumps(results)
 	else:
 		data = 'fail'

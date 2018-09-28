@@ -36,9 +36,12 @@ $( document ).ready(function() {
 		$.get("api/get_search_pages/", data, function(data) { $('#page_list').html(data); });
 	}
 
-	$("#add_page_button").click(function(e) {
-		$.get("create");
-	});
+	$("#goon_wip_article").click(function(e) {
+		let url = $("#wip_article_select").val() + "/edit";
+		$.get({url: url, success: function(data) {
+			window.location.href = url;
+		}});
 
+	});
 
 });

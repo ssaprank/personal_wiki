@@ -125,7 +125,7 @@ $( document ).ready(function() {
 
     $("#id_tags").autocomplete({
         source: "api/get_page_tags",
-        minLength: 2,
+        minLength: 2
     });
 
     $("#id_tags").keyup(function(e) {
