@@ -43,7 +43,7 @@
 		</a>
 	</div>
 	<div class="col-sm-5 mb-3 input-group">
-		{% if wip_pages is not None %}
+		{% if wip_pages.count > 0 %}
 		<div class="input-group-prepend">
 			<button class="btn btn-info input-group-text" id="goon_wip_article">Continue writing</button>
   		</div>
@@ -52,6 +52,9 @@
 				<option value="{{wip_page.id}}">{{wip_page.title}}</option>
 			{% endfor%}
   		</select>
+  		<div class="input-group-append">
+			<button class="btn btn-danger input-group-text" id="remove_wip_article">Discard article</button>
+  		</div>
   		{% endif %}
 	</div>
 </div>

@@ -16,12 +16,17 @@
 	</head>
 	<body>
 		<div class="container-fluid" id="base_container">
-			<div class="row" id="base_background_image_row">
-				<img id="base_background_image" src="{% static 'page/images/base_theme.jpg' %}" />
-			</div>
-			<div class="content" id="content_container">
-				{% block content %}
-				{% endblock %}
+			<div class="content">
+				<div class="row" id="base_background_image_row">
+					<div class="col">
+						<img id="base_background_image" src="{% static 'page/images/base_theme.jpg' %}" />
+					</div>
+				</div>
+				<div id="content_container" class="p-4">
+					<!-- Should always start with a <div class="row"> -->
+					{% block content %}
+					{% endblock %}
+				</div>
 			</div>
 		</div>
 	</body>

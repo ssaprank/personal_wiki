@@ -1,4 +1,5 @@
 {% extends './base.html' %}
+{% load staticfiles %}
 
 {% block content %}
 {% if page_form.instance.id is not None %}
@@ -58,17 +59,19 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="imagesInsertionModalLabel">Modal title</h5>
+                                <h5 class="modal-title" id="imagesInsertionModalLabel">Insert uploaded image</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
-                                {% if images is not None %}
+                            <div class="modal-body" id="image_insertion_modal_body">
+                                {% if images.count > 0 %}
                                 {% for image in images %}
-                                <input type="image" src="{{image.image.url}}" class="insert_image"
+                                    <input type="image" src="{{image.image.url}}" class="insert_image"
                                        id="insert_image_{{image.id}}" width="200"/>
                                 {% endfor %}
+                                {% else %}
+                                    <p class="text-secondary">No images for insertion. Go ahead and upload some!</p>
                                 {% endif %}
                             </div>
                             <div class="modal-footer">
@@ -84,19 +87,17 @@
             <div class="col">
                 <input type="button" id="html_view_toggle" value="Switch to view" class="btn btn-primary"/>
             </div>
-            <div class="col">
+            <div class="col-sm-2 font-weight-bold">
                 {{page_form.work_in_progress.label}} : &nbsp;
                 {{page_form.work_in_progress}}
             </div>
         </div>
         <div class="row mt-lg-5">
-            <div class="col-sm-3">
-            	<!--Used to preserve tags in case page wasn't saved successfully-->
-            	<input type="hidden" name="hidden_page_tags_input" id="hidden_page_tags_input" value="{{page_associated_tags}}"/>
-                <input type="submit" name="submit" class="btn btn-primary"/>
-            </div>
-            <div class="col">
-                <a class="badge badge-secondary backspace_link" href="{% url 'page:index' %}">Back to main page</a>
+            <div class="col-sm">
+                <button type="submit" name="submit" class="btn btn-primary p-2"><img src="{% static 'page/images/submit.png' %}"/> Publish page</button>
+                <!--Used to preserve tags in case page wasn't saved successfully-->
+                <input type="hidden" name="hidden_page_tags_input" id="hidden_page_tags_input" value="{{page_associated_tags}}"/>
+                <a class="badge badge-secondary p-2" href="{% url 'page:index' %}"><img src="{% static 'page/images/back_arrow.png' %}"/> Back to main page</a>
             </div>
         </div>
     </form>
@@ -112,9 +113,11 @@
     	<div class="col">
     		<div id="page_tags_container">
     			{% for tag in page_tags %}
-            		<div id="page_tag_name_{{tag.name}}">
-            			<span>{{tag.name}}</span>
-            			<button type="button" class="btn btn-danger remove_page_tag" id="remove_page_tag_{{tag.name}}">X</button>
+            		<div id="page_tag_name_{{tag.name}}" class="d-inline font-weight-bold">
+            			<button type="button" class="btn bg-light-gray remove_page_tag p-1 pl-2" id="remove_page_tag_{{tag.name}}">
+            				<span>{{tag.name}}</span>
+            				<img src="{% static 'page/images/delete_symbol.png' %}"/>
+            			</button>
             		</div>
     			{% endfor %}
     		</div>

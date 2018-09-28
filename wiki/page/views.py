@@ -30,7 +30,7 @@ def index(request):
 	for page in pages:
 		page.short_description = WikiStringHelper.get_article_short_description(page.html, 50)
 
-	render_params = {"greeting" : "hello", "pages" : pages, 'wip_pages' : wip_pages}
+	render_params = {"greeting" : "Velkommen", "pages" : pages, 'wip_pages' : wip_pages}
 	return render(request, template_name, render_params)
 
 def show_search_list(request):
@@ -86,7 +86,7 @@ def edit_page(request, page_id):
 					if Tag.objects.filter(name=tag).count() > 0:
 						existing_tag = Tag.objects.get(name=tag)
 						# if tag is already associated with page do nothing
-						if existing_tag.articles.get(pk=new_form.pk) is not None:
+						if existing_tag.articles.filter(pk=new_form.pk).count() > 0:
 							pass
 						else:
 							existing_tag.articles.add(current_article)
@@ -192,9 +192,10 @@ def get_page_tags(request):
 		search_query = request.GET.get('term', '')
 		tags = Tag.objects.filter(name__icontains=search_query)
 		results = []
-		for tag in tags:
-			if tag.articles.filter(work_in_progress=False).count() > 0:
-				results.append(tag.name)
+		if tags.count > 0:
+			for tag in tags:
+				if tag.articles.filter(work_in_progress=False).count() > 0:
+					results.append(tag.name)
 		data = json.dumps(results)
 	else:
 		data = 'fail'
@@ -212,11 +213,23 @@ def upload_image(request):
 		data = {'is_valid' : False}
 	return JsonResponse(data)
 
-def set_page_tag(request):
-	"""
-	gets page id and tag name
-	checks whether tag exists: if not creates it
-	checks whether tag is already bound to this page: if not bounds it
-	"""
-	#if request.is_ajax():
-	pass
+def get_last_uploaded_image(request):
+	if request.is_ajax():
+		template_name = 'page/pieces/template_image_for_insertion.html'
+		last_uploaded_image = Image.objects.order_by('-uploaded_at')[:1]
+		# needed to get the object from queryset
+		for img in last_uploaded_image:
+			render_params = {'image' : img}
+		return render(request, template_name, render_params)
+
+def get_last_inserted_tag(request):
+	if request.is_ajax():
+		tag_name = request.GET.get('tag_name', '')
+		print(tag_name)
+		if tag_name:
+			template_name = 'page/pieces/template_new_page_tag.html'
+			render_params = {'tag_name' : tag_name}
+			return render(request, template_name, render_params)
+
+
+

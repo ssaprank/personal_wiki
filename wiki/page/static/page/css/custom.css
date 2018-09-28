@@ -8,7 +8,6 @@ html, body {
 
 #base_background_image_row {
 	margin-top: 10px;
-
 }
 
 #base_background_image {
@@ -24,8 +23,6 @@ html, body {
 }
 
 #content_container {
-	padding: 20px;
-	margin-top: 10px;
 	margin-left: auto;
 	margin-right: auto;
 	width: 90%;
@@ -43,4 +40,12 @@ a.backspace_link {
 
 #add_new_page_button {
 	font-size: 30px;
+}
+
+.bg-light-gray {
+	background-color: "light-gray";
+}
+
+a.button-link-normal {
+	font-size: 14px;
 }

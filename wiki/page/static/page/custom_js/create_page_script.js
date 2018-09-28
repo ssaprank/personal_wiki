@@ -2,6 +2,7 @@ $( document ).ready(function() {
     var textarea;
 
     bindRemovePageTagEventListener();
+    bindInsertImageEventListener();
 
     function getCookie(name) {
         var cookieValue = null;
@@ -79,22 +80,15 @@ $( document ).ready(function() {
         done: function (e, data) {
             if (data.result.is_valid) {
                 alert("Photos successfully uploaded! Url: " + data.result.url);
+                // now add image to the modal for insertion
+                getLastUploadedImageForInsertion();
             } else {
                 alert("There was an error uploading your images");
             }
         }
     });
 
-    $(".insert_image").click(function(e) {
-        e.preventDefault();
-        let textarea = $("#id_html");
-        let imageUrl = $(this).prop("src");
-        let htmlString = '<img src="' + imageUrl + '" />';
-        let value = textarea.val();
-        textarea.val(value + htmlString);
-        $('#imagesInsertionModal').modal('hide');
-        textarea.focus();
-    });
+    
 
     function insertTag(tag)
     {
@@ -132,10 +126,7 @@ $( document ).ready(function() {
         if (e.keyCode == 13) {
             // on pressing enter - add to page tags container div its name and a button that will delete it
             let tagName = $(this).val();
-            let html = '<div id="page_tag_name_' + tagName + '"><span>' + tagName + ' </span><button type="button" class="btn btn-danger remove_page_tag" id="remove_page_tag_' + tagName + '">X</button></div>';
-            $("#page_tags_container").html($("#page_tags_container").html() + html);
-            $("#page_tags_container").show();
-            
+            // hidden input is being read after the form gets submitted
             let hiddenInputVal = $("#hidden_page_tags_input").val();
             
             if (hiddenInputVal == "") {
@@ -144,15 +135,17 @@ $( document ).ready(function() {
                 $("#hidden_page_tags_input").val(hiddenInputVal + "," + tagName)
             }
 
-            bindRemovePageTagEventListener();
+            // after creating a new tag - insert appropriate html to the tags container
+            getLastInsertedTag(tagName);
 
-            console.log($("#hidden_page_tags_input").val());
             $(this).val("");
         }
     });
 
+    // bind event listener to all remove_page_tag buttons (needed when creating new buttons on-the-fly)
     function bindRemovePageTagEventListener() {
-        $("button.remove_page_tag").click(function(e) {
+        $("button.remove_page_tag").unbind("click");
+        $("button.remove_page_tag").click(function(e) { 
             let tagName = $(this).attr('id').replace("remove_page_tag_","");
             let hiddenInputValue = $("#hidden_page_tags_input").val(); 
 
@@ -164,4 +157,43 @@ $( document ).ready(function() {
             $("#hidden_page_tags_input").val(hiddenInputValue);                
         });
     }
+
+    function bindInsertImageEventListener() {
+        $(".insert_image").unbind("click");
+        $(".insert_image").click(function(e) {
+            e.preventDefault();
+            let textarea = $("#id_html");
+            let imageUrl = $(this).prop("src");
+            let htmlString = '<img src="' + imageUrl + '" />';
+            let value = textarea.val();
+            textarea.val(value + htmlString);
+            $('#imagesInsertionModal').modal('hide');
+            textarea.focus();
+        });
+    }
+
+    function getLastUploadedImageForInsertion() {
+        $.get({
+            url: "http://127.0.0.1:8000/api/get_last_uploaded_image",
+            success: function(data) {
+                let modalBodyElement = $("#image_insertion_modal_body"); 
+                modalBodyElement.html(modalBodyElement.html() + data);
+                bindInsertImageEventListener();
+            }
+        });
+    }
+
+    function getLastInsertedTag(tagName) {
+        $.get({
+            url: "http://127.0.0.1:8000/api/get_last_inserted_tag",
+            data: {'tag_name' : tagName},
+            success: function(data) {
+                let tagContainerElement = $("#page_tags_container"); 
+                tagContainerElement.html(tagContainerElement.html() + data);
+                bindRemovePageTagEventListener();
+            }
+        });
+    }
+
+
 });

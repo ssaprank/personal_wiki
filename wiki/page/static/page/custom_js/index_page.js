@@ -44,4 +44,12 @@ $( document ).ready(function() {
 
 	});
 
+	$("#remove_wip_article").click(function(e) {
+		let url = $("#wip_article_select").val() + "/delete";
+		$.get({url: url, success: function(data) {
+			window.location.href = url;
+		}});
+
+	});
+
 });
