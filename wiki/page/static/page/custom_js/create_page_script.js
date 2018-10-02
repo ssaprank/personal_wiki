@@ -1,7 +1,9 @@
 const STORAGE_PAGE_URL_ITEM = "current_url";
 const STORAGE_PAGE_DATA_ITEM = "page_data";
+const API_ENDPOINT = "http://127.0.0.1:8000/api/";
 // if true - the page is being submitted, so no data should be written to the local storage
 var pageBeingSubmitted = false;
+
 
 $( document ).ready(function() {
     var textarea = $('#id_html');
@@ -185,7 +187,7 @@ $( document ).ready(function() {
     }
 
     $("#id_tags").autocomplete({
-        source: "api/get_page_tags",
+        source: API_ENDPOINT + "get_page_tags",
         minLength: 2
     });
 
@@ -194,6 +196,10 @@ $( document ).ready(function() {
         if (e.keyCode == 13) {
             // on pressing enter - add to page tags container div its name and a button that will delete it
             let tagName = $(this).val();
+
+            if (tagName == "") {
+                return;
+            }
 
             // if new tag name does not contain any of the special characters
             if (specialCharactersRegex.test(tagName)) {
@@ -247,7 +253,7 @@ $( document ).ready(function() {
 
     function getLastUploadedImageForInsertion() {
         $.get({
-            url: "http://127.0.0.1:8000/api/get_last_uploaded_image",
+            url: API_ENDPOINT + "get_last_uploaded_image",
             success: function(data) {
                 let modalBodyElement = $("#image_insertion_modal_body"); 
                 modalBodyElement.html(modalBodyElement.html() + data);
@@ -258,7 +264,7 @@ $( document ).ready(function() {
 
     function getLastInsertedTag(tagName) {
         $.get({
-            url: "http://127.0.0.1:8000/api/get_last_inserted_tag",
+            url: API_ENDPOINT + "get_last_inserted_tag",
             data: {'tag_name' : tagName},
             success: function(data) {
                 let tagContainerElement = $("#page_tags_container"); 

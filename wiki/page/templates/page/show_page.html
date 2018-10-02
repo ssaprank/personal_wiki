@@ -34,10 +34,16 @@
 <hr/>
 {% endif %}
 <div class=" row mt-lg-2">
-	<div class="col sm-1">
-		<a class="badge badge-primary p-2" href="{% url 'page:edit' page_id=page_object.id %}"><img src="{% static 'page/images/pencil.png' %}"/> Edit this page</a>
-		<a class="badge badge-secondary p-2" href="{% url 'page:index' %}"><img src="{% static 'page/images/back_arrow.png' %}"/> Back to main page</a>
-		<a class="badge badge-danger p-2" href="{% url 'page:delete' page_id=page_object.id %}"><img src="{% static 'page/images/delete_symbol.png' %}"/> Delete page</a>
-	</div>	
+	<div class="col-sm-5">
+		<a class="badge badge-primary p-2 link-button-normal" href="{% url 'page:edit' page_id=page_object.id %}"><img src="{% static 'page/images/pencil.png' %}"/> Edit page</a>
+		
+		
+	</div>
+	<div class="col-sm-5">
+		<a class="badge badge-secondary p-2 link-button-normal" href="{% url 'page:index' %}"><img src="{% static 'page/images/back_arrow.png' %}"/> Back to main page</a>
+	</div>
+	<div class="col-sm-2">
+		<a class="badge badge-danger p-2 link-button-normal" href="{% url 'page:delete' page_id=page_object.id %}"><img src="{% static 'page/images/delete_symbol.png' %}"/> Delete page</a>
+	</div>
 </div>
 {% endblock %}

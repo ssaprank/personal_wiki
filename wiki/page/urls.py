@@ -14,6 +14,12 @@ urlpatterns = [ #pylint: disable=invalid-name
     re_path(r'^api/get_page_tags/', views.get_page_tags, name='get_page_tags'),
     re_path(r'^api/get_search_pages/', views.show_search_list, name='show_search_list'),
     re_path(r'^api/upload_image/', views.upload_image, name='upload_image'),
-    re_path(r'^api/get_last_uploaded_image/', views.get_last_uploaded_image, name='get_last_uploaded_image'),
-    re_path(r'^api/get_last_inserted_tag/', views.get_last_inserted_tag, name='get_last_inserted_tag'),
+    re_path(r'^api/get_last_uploaded_image/',
+    	views.get_last_uploaded_image,
+    	name='get_last_uploaded_image'
+    	),
+    re_path(r'^api/get_last_inserted_tag/',
+    	views.get_last_inserted_tag,
+    	name='get_last_inserted_tag'
+    	),
 ]

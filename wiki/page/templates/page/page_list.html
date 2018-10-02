@@ -3,7 +3,7 @@
 		<a href="{% url 'page:show' page_id=page.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
 			<div class="d-flex w-100 justify-content-between">
 				<h5 class="mb-1 list_article_title text-dark">{{page.title}}</h5>
-				<small>Last modified: {{page.created}}</small>
+				<small><i>Last modified: {{page.last_modified}}</i></small>
 			</div>
 			<div class="mb-1">
 				{% autoescape off %}

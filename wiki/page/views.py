@@ -3,14 +3,11 @@ Contains views of the page module
 """
 import json
 import os
-import base64
-import re
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 
 from .models import Article, ArticleForm, Image, ImageForm, Tag
@@ -18,7 +15,8 @@ from .helpers import WikiStringHelper
 
 HTML_TAG_ROW = ['a', 'b', 'h1', 'i', 'ul', 'li']
 HTML_TAGS_FILE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
-HTML_TAG_LIST = list(map(lambda s: s.replace("\n", ""), open(HTML_TAGS_FILE_PATH, 'r').readlines()))
+HTML_TAG_LIST = [x.replace("\n", "") for x in open(HTML_TAGS_FILE_PATH, 'r').readlines()]
+SHORT_DESCRIPTION_LENGTH = 300
 
 def index(request):
 	"""Main view - list all pages"""
@@ -28,7 +26,10 @@ def index(request):
 	wip_pages = Article.objects.filter(work_in_progress=True)
 
 	for page in pages:
-		page.short_description = WikiStringHelper.get_article_short_description(page.html, 300)
+		page.short_description = WikiStringHelper.get_article_short_description(
+			page.html,
+			SHORT_DESCRIPTION_LENGTH
+			)
 
 	render_params = {"greeting" : "Velkommen", "pages" : pages, 'wip_pages' : wip_pages}
 	return render(request, template_name, render_params)
@@ -50,7 +51,10 @@ def show_search_list(request):
 		pages = Article.objects.filter(**filters).order_by('-last_modified')[:5]
 
 		for page in pages:
-			page.short_description = WikiStringHelper.get_article_short_description(page.html, 50)
+			page.short_description = WikiStringHelper.get_article_short_description(
+				page.html,
+				SHORT_DESCRIPTION_LENGTH
+				)
 
 		render_params = {"pages" : pages}
 		return render(request, template_name, render_params)
@@ -77,28 +81,11 @@ def edit_page(request, page_id):
 
 		if page_form.is_valid():
 			page_form.instance.last_modified = timezone.now()
-			new_form = page_form.save()
-			current_article = Article.objects.get(pk=new_form.pk)
-
-			if hidden_tags_input is not "":
-				for tag in hidden_tags_input.split(','):
-					# if tag already exists
-					if Tag.objects.filter(name=tag).count() > 0:
-						existing_tag = Tag.objects.get(name=tag)
-						# if tag is already associated with page do nothing
-						if existing_tag.articles.filter(pk=new_form.pk).count() > 0:
-							pass
-						else:
-							existing_tag.articles.add(current_article)
-					else:
-						# create new tag and append article to it
-						new_tag = Tag(name=tag)
-						new_tag.save()
-						new_tag.articles.add(current_article)
+			new_form_id = save_page_form(page_form, hidden_tags_input)
 
 			# now check if tags that are associated with page are not presented in hidden_tags_input
-			page_tags = Tag.objects.filter(articles__id=new_form.pk)
-			page_object = Article.objects.get(id=new_form.pk)
+			page_tags = Tag.objects.filter(articles__id=new_form_id)
+			page_object = Article.objects.get(id=new_form_id)
 
 			hidden_tags_input_list = hidden_tags_input.split(",")
 
@@ -140,27 +127,9 @@ def create_page(request):
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST)
 
-		if page_form.is_valid():				
-			new_form = page_form.save()
-			new_article = Article.objects.get(pk=new_form.pk)
-
+		if page_form.is_valid():
 			hidden_tags_input = request.POST.get('hidden_page_tags_input', '')
-
-			if hidden_tags_input is not "":
-				for tag in hidden_tags_input.split(','):
-					# if tag already exists
-					if Tag.objects.filter(name=tag).count() > 0:
-						existing_tag = Tag.objects.get(name=tag)
-						# if tag is already associated with page do nothing
-						if existing_tag.articles.filter(pk=new_form.pk).count() > 0:
-							pass
-						else:
-							existing_tag.articles.add(new_article)
-					else:
-						# create new tag and append article to it
-						new_tag = Tag(name=tag)
-						new_tag.save()
-						new_tag.articles.add(new_article)
+			save_page_form(page_form, hidden_tags_input)
 
 			return redirect('page:index')
 		else:
@@ -175,6 +144,29 @@ def create_page(request):
 		render_params['page_form'] = ArticleForm()
 		render_params['page_tags'] = {}
 		return render(request, template_name, render_params)
+
+def save_page_form(page_form, hidden_tags_input):
+	"""Stores the article form along with its tags"""
+	new_form = page_form.save()
+	new_article = Article.objects.get(pk=new_form.pk)
+	new_form_id = new_form.pk
+
+	if hidden_tags_input is not "":
+		for tag in hidden_tags_input.split(','):
+			# if tag already exists
+			if Tag.objects.filter(name=tag).count() > 0:
+				existing_tag = Tag.objects.get(name=tag)
+				# if tag is already associated with page do nothing
+				if existing_tag.articles.filter(pk=new_form.pk).count() > 0:
+					pass
+				else:
+					existing_tag.articles.add(new_article)
+			else:
+				# create new tag and append article to it
+				new_tag = Tag(name=tag)
+				new_tag.save()
+				new_tag.articles.add(new_article)
+	return new_form_id
 
 def delete_page(request, page_id): # pylint: disable=unused-argument
 	"""
@@ -199,7 +191,7 @@ def get_page_tags(request):
 		search_query = request.GET.get('term', '')
 		tags = Tag.objects.filter(name__icontains=search_query)
 		results = []
-		if tags.count > 0:
+		if tags.count() > 0:
 			for tag in tags:
 				if tag.articles.filter(work_in_progress=False).count() > 0:
 					results.append(tag.name)
@@ -221,6 +213,7 @@ def upload_image(request):
 	return JsonResponse(data)
 
 def get_last_uploaded_image(request):
+	"""Renders the image that was uploaded last so it can be used for insertion"""
 	if request.is_ajax():
 		template_name = 'page/pieces/template_image_for_insertion.html'
 		last_uploaded_image = Image.objects.order_by('-uploaded_at')[:1]
@@ -230,9 +223,9 @@ def get_last_uploaded_image(request):
 		return render(request, template_name, render_params)
 
 def get_last_inserted_tag(request):
+	"""Receives the tag name per ajax and renders bootstrap box to immediately show it on the page"""
 	if request.is_ajax():
 		tag_name = request.GET.get('tag_name', '')
-		print(tag_name)
 		if tag_name:
 			template_name = 'page/pieces/template_new_page_tag.html'
 			render_params = {'tag_name' : tag_name}

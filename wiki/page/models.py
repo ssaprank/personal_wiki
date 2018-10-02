@@ -1,6 +1,6 @@
 """Holds models of the page module"""
 from django.db import models
-from django.forms import ModelForm, Textarea, TextInput, ModelMultipleChoiceField
+from django.forms import ModelForm, Textarea, TextInput
 
 class Article(models.Model):
 	"""Represents an Article"""
@@ -17,20 +17,23 @@ class Article(models.Model):
 		return string + "\n\n"
 
 class Image(models.Model):
+	"""Represents an image"""
 	title = models.CharField(max_length=100)
 	image = models.ImageField(upload_to='images/')
 	uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class Tag(models.Model):
+	"""Represents a tag associated to one or more articles"""
 	name = models.CharField(max_length=100, unique=True)
 	articles = models.ManyToManyField(Article)
 
 	def has_one_article(self):
+		"""Checks if tag only has one article associated with it"""
 		return self.articles.count() == 1
 
 	def __str__(self):
 		string = "Name : %s" % (self.name)
-		
+
 		if self.articles.all().count() > 0:
 			string += " Articles:"
 			for article in self.articles.all():
@@ -39,7 +42,9 @@ class Tag(models.Model):
 		return string
 
 class ImageForm(ModelForm):
+	"""Represents an image form"""
 	class Meta:
+		"""Contains metadata for image form"""
 		model = Image
 		fields = ('image', )
 
@@ -56,14 +61,3 @@ class ArticleForm(ModelForm):
 		labels = {
 			'html' : 'Write your Article',
 		}
-
-	#tags = ModelMultipleChoiceField(queryset=Tag.objects.all())
-
-	# Provide initial data for 'tags' field
-	#def __init__(self, *args, **kwargs):
-	# In case we build the form from an instance (if not, 'tags'are empty)
-		#if kwargs.get('instance'):
-			#initial = kwargs.setdefault('initial', {})
-			#initial['tags'] = [t.pk for t in kwargs['instance'].tag_set.all()]
-
-		#ModelForm.__init__(self, *args, **kwargs)
