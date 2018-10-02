@@ -1,8 +1,78 @@
+const STORAGE_PAGE_URL_ITEM = "current_url";
+const STORAGE_PAGE_DATA_ITEM = "page_data";
+// if true - the page is being submitted, so no data should be written to the local storage
+var pageBeingSubmitted = false;
+
 $( document ).ready(function() {
-    var textarea;
+    var textarea = $('#id_html');
+    var specialCharactersRegex = /[!@#$%\^\&\*()_+\-=\[\]{};:'"\\|,.<>\/\?]/;
 
     bindRemovePageTagEventListener();
     bindInsertImageEventListener();
+
+    $(window).on("unload beforeunload", function() {
+        current_url = window.location.pathname;
+
+        // if we just loaded create or edit page view
+        if (/^\/(\d+\/edit|create)$/.test(current_url) && !pageBeingSubmitted) {
+            // refill the storage
+
+            let data = JSON.stringify({
+                "title" : $('#id_title').val(),
+                "html" : $('#id_html').val(),
+                "wip" : $('#id_work_in_progress').val()
+            });
+
+            localStorage.setItem(STORAGE_PAGE_DATA_ITEM, data);
+            localStorage.setItem(STORAGE_PAGE_URL_ITEM, current_url);
+        }
+    });
+
+    window.onload = function() {
+        current_url = window.location.pathname;
+        pageBeingSubmitted = false;
+
+        // if we just loaded create or edit page view
+        if (/^\/(\d+\/edit|create)$/.test(current_url)) {
+            let storedPage = localStorage.getItem(STORAGE_PAGE_URL_ITEM);
+            console.log(storedPage);
+            if (storedPage != null) {
+                if (storedPage == current_url) {
+                    console.log("her")
+                    // load storage info
+                    let storedPageData = JSON.parse(localStorage.getItem(STORAGE_PAGE_DATA_ITEM));
+                    let title = storedPageData.title;
+                    let html = storedPageData.html;
+                    let hidden_tags_input = storedPageData.hiddenTagsInput;
+                    let wip = storedPageData.wip;
+
+                    $('#id_title').val(title);
+                    $('#id_html').val(html);
+                    $('#id_work_in_progress').val(wip);
+                } else {
+                    // remove storage info
+                    localStorage.removeItem(STORAGE_PAGE_DATA_ITEM);
+                    localStorage.removeItem(STORAGE_PAGE_URL_ITEM);
+                }
+            }
+        }
+    }
+
+    $("#edit_page_form").keydown(function(e) {
+        if (e.keyCode == 13 && !(textarea.is(":focus"))) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    $("#edit_page_form").submit(function(e) {
+        current_url = window.location.pathname;
+        pageBeingSubmitted = true;
+
+        // clear storage data of the page
+        localStorage.removeItem(STORAGE_PAGE_DATA_ITEM);
+        localStorage.removeItem(STORAGE_PAGE_URL_ITEM);
+    });
 
     function getCookie(name) {
         var cookieValue = null;
@@ -50,7 +120,6 @@ $( document ).ready(function() {
             obj.val('Switch to view');
             $("#edit_page_button_row").show();
         } else {
-            textarea = $('#id_html');
             let viewarea = $('#html_wrapper');
             let width = textarea.width();
             let height = textarea.height();
@@ -88,11 +157,9 @@ $( document ).ready(function() {
         }
     });
 
-    
 
     function insertTag(tag)
     {
-        let textarea = $("#id_html");
         let value = textarea.val();
 
         let caretPosition = textarea.prop("selectionStart");
@@ -123,22 +190,29 @@ $( document ).ready(function() {
     });
 
     $("#id_tags").keyup(function(e) {
+        e.preventDefault();
         if (e.keyCode == 13) {
             // on pressing enter - add to page tags container div its name and a button that will delete it
             let tagName = $(this).val();
-            // hidden input is being read after the form gets submitted
-            let hiddenInputVal = $("#hidden_page_tags_input").val();
-            
-            if (hiddenInputVal == "") {
-                $("#hidden_page_tags_input").val(tagName)
+
+            // if new tag name does not contain any of the special characters
+            if (specialCharactersRegex.test(tagName)) {
+                $("#error_modal_body").text("Tags must not contain any special characters!");
+                $('#error_message_modal').modal('show');
             } else {
-                $("#hidden_page_tags_input").val(hiddenInputVal + "," + tagName)
+                // hidden input is being read after the form gets submitted
+                let hiddenInputVal = $("#hidden_page_tags_input").val();
+                if (hiddenInputVal == "") {
+                    $("#hidden_page_tags_input").val(tagName)
+                } else {
+                    $("#hidden_page_tags_input").val(hiddenInputVal + "," + tagName)
+                }
+
+                // after creating a new tag - insert appropriate html to the tags container
+                getLastInsertedTag(tagName);
+
+                $(this).val("");
             }
-
-            // after creating a new tag - insert appropriate html to the tags container
-            getLastInsertedTag(tagName);
-
-            $(this).val("");
         }
     });
 
@@ -162,7 +236,6 @@ $( document ).ready(function() {
         $(".insert_image").unbind("click");
         $(".insert_image").click(function(e) {
             e.preventDefault();
-            let textarea = $("#id_html");
             let imageUrl = $(this).prop("src");
             let htmlString = '<img src="' + imageUrl + '" />';
             let value = textarea.val();

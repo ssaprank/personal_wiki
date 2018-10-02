@@ -15,7 +15,7 @@ class WikiStringHelper:
 		if len(html) < pure_length:
 			pure_length = len(html) - 1
 
-		while pure_length_used <= pure_length:
+		while full_length <= pure_length and pure_length_used <= pure_length:
 			if html[full_length] is '<':
 				open_tag = True
 			elif html[full_length] is '>':
@@ -28,8 +28,8 @@ class WikiStringHelper:
 		if open_tag is True:
 			# last tag is still open - remove it
 			short_description = html[: full_length]
-			short_description = html[: short_description.rindex('<')] + html[short_description.rindex('>') + 1 : full_length]
+			short_description = html[: short_description.rindex('<')]
 		else:
-			short_description = html[: full_length - 1]
+			short_description = html[: full_length]
 
 		return short_description

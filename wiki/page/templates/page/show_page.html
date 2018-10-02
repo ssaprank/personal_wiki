@@ -25,7 +25,7 @@
 	</div>
 </div>
 <hr/>
-{% if page_object.tag_set.all.count %}
+{% if page_object.tag_set.all.count > 0 %}
 <div class="row mt-lg-2">
 	<div class="col">
 		Tags: {% for tag in page_object.tag_set.all %} {{ tag.name }} {% endfor %}

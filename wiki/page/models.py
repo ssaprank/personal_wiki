@@ -25,6 +25,9 @@ class Tag(models.Model):
 	name = models.CharField(max_length=100, unique=True)
 	articles = models.ManyToManyField(Article)
 
+	def has_one_article(self):
+		return self.articles.count() == 1
+
 	def __str__(self):
 		string = "Name : %s" % (self.name)
 		

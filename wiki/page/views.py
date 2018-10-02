@@ -16,7 +16,7 @@ from django.conf import settings
 from .models import Article, ArticleForm, Image, ImageForm, Tag
 from .helpers import WikiStringHelper
 
-HTML_TAG_ROW = ['a', 'b', 'h1', 'h5', 'i', 'strong']
+HTML_TAG_ROW = ['a', 'b', 'h1', 'i', 'ul', 'li']
 HTML_TAGS_FILE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
 HTML_TAG_LIST = list(map(lambda s: s.replace("\n", ""), open(HTML_TAGS_FILE_PATH, 'r').readlines()))
 
@@ -28,7 +28,7 @@ def index(request):
 	wip_pages = Article.objects.filter(work_in_progress=True)
 
 	for page in pages:
-		page.short_description = WikiStringHelper.get_article_short_description(page.html, 50)
+		page.short_description = WikiStringHelper.get_article_short_description(page.html, 300)
 
 	render_params = {"greeting" : "Velkommen", "pages" : pages, 'wip_pages' : wip_pages}
 	return render(request, template_name, render_params)
@@ -80,7 +80,7 @@ def edit_page(request, page_id):
 			new_form = page_form.save()
 			current_article = Article.objects.get(pk=new_form.pk)
 
-			if hidden_tags_input is not None:
+			if hidden_tags_input is not "":
 				for tag in hidden_tags_input.split(','):
 					# if tag already exists
 					if Tag.objects.filter(name=tag).count() > 0:
@@ -120,7 +120,6 @@ def edit_page(request, page_id):
 
 			return render(request, template_name, render_params)
 	else:
-		print("non post request")
 		render_params['page_tags'] = Tag.objects.filter(articles__id=page_object.id)
 		render_params['page_form'] = ArticleForm(instance=page_object)
 		render_params['page_associated_tags'] = ""
@@ -147,13 +146,13 @@ def create_page(request):
 
 			hidden_tags_input = request.POST.get('hidden_page_tags_input', '')
 
-			if hidden_tags_input is not None:
+			if hidden_tags_input is not "":
 				for tag in hidden_tags_input.split(','):
 					# if tag already exists
 					if Tag.objects.filter(name=tag).count() > 0:
 						existing_tag = Tag.objects.get(name=tag)
 						# if tag is already associated with page do nothing
-						if existing_tag.articles.get(pk=new_form.pk) is not None:
+						if existing_tag.articles.filter(pk=new_form.pk).count() > 0:
 							pass
 						else:
 							existing_tag.articles.add(new_article)
@@ -178,8 +177,16 @@ def create_page(request):
 		return render(request, template_name, render_params)
 
 def delete_page(request, page_id): # pylint: disable=unused-argument
-	""" Deletes page by ID and redirects to index """
-	Article.objects.filter(id=page_id).delete()
+	"""
+	Deletes page by ID and redirects to index
+	Also deletes its tags if they are not bound to any other page
+	"""
+	if Article.objects.filter(id=page_id).count() > 0:
+		for tag in Tag.objects.filter(articles__id=page_id):
+			if tag.has_one_article():
+				tag.delete()
+		Article.objects.filter(id=page_id).delete()
+
 	return redirect('page:index')
 
 def get_page_tags(request):

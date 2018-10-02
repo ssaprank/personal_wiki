@@ -2,20 +2,39 @@
 {% load staticfiles %}
 
 {% block content %}
+<!-- Bootstrap Modal for showing error message -->
+<div class="modal bg-dark" id="error_message_modal" tabindex="-1" role="dialog" aria-labelledby="error_modal_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header alert alert-danger">
+                <h5 class="modal-title" id="error_modal_label">Error</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="error_modal_body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% if page_form.instance.id is not None %}
-<form method="POST" action="{% url 'page:edit' page_id=page_form.instance.id %}">
-    {% else %}
-    <form method="POST" action="{% url 'page:create' %}">
-        {% endif %}
-        {% csrf_token %}
-        <div class="row mt-lg-2">
+    <form method="POST" action="{% url 'page:edit' page_id=page_form.instance.id %}" id="edit_page_form">
+{% else %}
+    <form method="POST" action="{% url 'page:create' %}" id="edit_page_form">
+{% endif %}
+{% csrf_token %}
+        <div class="row mt-2">
             <div class="col">
                 {{page_form.title.label}} : &nbsp;
                 {{page_form.title}}
             </div>
         </div>
-        <div id="html_wrapper" class="row mt-lg-3">
-            <div class="col">
+        <div class="d-inline row mt-3">
+            <div class="col-lg" id="html_wrapper">
                 {{page_form.html.label}} : &nbsp;
                 {{page_form.html}}
             </div>
@@ -52,35 +71,6 @@
                     Insert Images
                 </button>
 
-                <!-- Bootstrap Modal -->
-                <div class="modal bg-dark" id="imagesInsertionModal" tabindex="-1" role="dialog"
-                     aria-labelledby="imagesInsertionModalLabel"
-                     aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="imagesInsertionModalLabel">Insert uploaded image</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body" id="image_insertion_modal_body">
-                                {% if images.count > 0 %}
-                                {% for image in images %}
-                                    <input type="image" src="{{image.image.url}}" class="insert_image"
-                                       id="insert_image_{{image.id}}" width="200"/>
-                                {% endfor %}
-                                {% else %}
-                                    <p class="text-secondary">No images for insertion. Go ahead and upload some!</p>
-                                {% endif %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Save changes</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="button_row row mt-lg-2">
@@ -92,6 +82,25 @@
                 {{page_form.work_in_progress}}
             </div>
         </div>
+            <div class="row mt-lg-4">
+        <div class="col-sm-3">
+            Add tag: <input type="text" class="form-control-sm" id="id_tags"/>
+        </div>
+        <div class="col-sm-2">
+            <div id="page_tags_container">
+                {% if page_tags.count > 0 %}
+                {% for tag in page_tags %}
+                    <div id="page_tag_name_{{tag.name}}" class="d-inline font-weight-bold">
+                        <button type="button" class="btn bg-light-gray remove_page_tag p-1 pl-2 mb-2" id="remove_page_tag_{{tag.name}}">
+                            <span>{{tag.name}}</span>
+                            <img src="{% static 'page/images/delete_symbol.png' %}"/>
+                        </button>
+                    </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
         <div class="row mt-lg-5">
             <div class="col-sm">
                 <button type="submit" name="submit" class="btn btn-primary p-2"><img src="{% static 'page/images/submit.png' %}"/> Publish page</button>
@@ -101,27 +110,37 @@
             </div>
         </div>
     </form>
-    {% if form_errors is not None %}
-    {% for field in page_form %}
+{% if form_errors is not None %}
+{% for field in page_form %}
     {{ field.errors }}
-    {% endfor %}
-    {% endif %}
-    <div class="row mt-lg-4">
-    	<div class="col">
-    		Add tag: <input type="text" class="form-control-sm" name="tags" id="id_tags"/>
-    	</div>
-    	<div class="col">
-    		<div id="page_tags_container">
-    			{% for tag in page_tags %}
-            		<div id="page_tag_name_{{tag.name}}" class="d-inline font-weight-bold">
-            			<button type="button" class="btn bg-light-gray remove_page_tag p-1 pl-2" id="remove_page_tag_{{tag.name}}">
-            				<span>{{tag.name}}</span>
-            				<img src="{% static 'page/images/delete_symbol.png' %}"/>
-            			</button>
-            		</div>
-    			{% endfor %}
-    		</div>
-    	</div>
+{% endfor %}
+{% endif %}
+
+<!-- Bootstrap Modal for image insertion -->
+<div class="modal bg-dark" id="imagesInsertionModal" tabindex="-1" role="dialog" aria-labelledby="imagesInsertionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imagesInsertionModalLabel">Insert uploaded image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="image_insertion_modal_body">
+                {% if images.count > 0 %}
+                {% for image in images %}
+                    <input type="image" src="{{image.image.url}}" class="insert_image" id="insert_image_{{image.id}}" width="200"/>
+                {% endfor %}
+                {% else %}
+                    <p class="text-secondary">No images for insertion. Go ahead and upload some!</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}
 
