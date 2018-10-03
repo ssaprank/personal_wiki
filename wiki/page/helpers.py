@@ -12,6 +12,8 @@ class WikiStringHelper:
 		open_tag = False
 		short_description = ''
 
+		html = html.replace("<br/>", "").replace("<br>","")
+
 		if len(html) < pure_length:
 			pure_length = len(html) - 1
 

@@ -20,7 +20,6 @@ html, body {
 #greeting_header {
 	text-align: center;
 	color: #293065;
-	text-shadow: 2px 2px #201C49;
 }
 
 #content_container {
@@ -47,11 +46,12 @@ a.backspace_link {
 	background-color: "light-gray";
 }
 
-a.button-link-normal {
-	font-size: 14px;
-}
-
 a.link-button-normal {
 	font-size: 18px;
 	margin-right: 15px;
+}
+
+a.link-button-delete {
+	font-size: 18px;
+	float: right;
 }

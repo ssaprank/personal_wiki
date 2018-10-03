@@ -8,7 +8,7 @@
 		<hr>
 	</div>	
 </div>
-<div class=" row mt-lg-2 article_header">
+<div class=" row mt-lg-2">
 	<div class="col">
 	{% autoescape off %}
 	{{page_object.html}}
@@ -18,17 +18,18 @@
 <hr/>
 <div class="row mt-lg-2">
 	<div class="col">
-		<b>Created:</b> {{page_object.created}}
+		<p><span class="font-weight-bold">Created:</span> {{page_object.created}}</p>
+		<p><span class="font-weight-bold">Last modified:</span> {{page_object.last_modified}}</p>
 	</div>	
-	<div class="col">
-		<b>Last modified:</b> {{page_object.last_modified}}
-	</div>
 </div>
 <hr/>
 {% if page_object.tag_set.all.count > 0 %}
 <div class="row mt-lg-2">
 	<div class="col">
-		Tags: {% for tag in page_object.tag_set.all %} {{ tag.name }} {% endfor %}
+		<p>
+			<span class="font-weight-bold">Tags:</span>
+			{% for tag in page_object.tag_set.all %} {{ tag.name }} {% endfor %}
+		</p>
 	</div>
 </div>
 <hr/>
@@ -36,14 +37,12 @@
 <div class=" row mt-lg-2">
 	<div class="col-sm-5">
 		<a class="badge badge-primary p-2 link-button-normal" href="{% url 'page:edit' page_id=page_object.id %}"><img src="{% static 'page/images/pencil.png' %}"/> Edit page</a>
-		
-		
 	</div>
 	<div class="col-sm-5">
 		<a class="badge badge-secondary p-2 link-button-normal" href="{% url 'page:index' %}"><img src="{% static 'page/images/back_arrow.png' %}"/> Back to main page</a>
 	</div>
 	<div class="col-sm-2">
-		<a class="badge badge-danger p-2 link-button-normal" href="{% url 'page:delete' page_id=page_object.id %}"><img src="{% static 'page/images/delete_symbol.png' %}"/> Delete page</a>
+		<a class="badge badge-danger p-2 link-button-delete" href="{% url 'page:delete' page_id=page_object.id %}"><img src="{% static 'page/images/delete_symbol.png' %}"/> Delete page</a>
 	</div>
 </div>
 {% endblock %}

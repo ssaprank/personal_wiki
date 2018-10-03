@@ -37,10 +37,8 @@ $( document ).ready(function() {
         // if we just loaded create or edit page view
         if (/^\/(\d+\/edit|create)$/.test(current_url)) {
             let storedPage = localStorage.getItem(STORAGE_PAGE_URL_ITEM);
-            console.log(storedPage);
             if (storedPage != null) {
                 if (storedPage == current_url) {
-                    console.log("her")
                     // load storage info
                     let storedPageData = JSON.parse(localStorage.getItem(STORAGE_PAGE_DATA_ITEM));
                     let title = storedPageData.title;
@@ -70,6 +68,11 @@ $( document ).ready(function() {
     $("#edit_page_form").submit(function(e) {
         current_url = window.location.pathname;
         pageBeingSubmitted = true;
+
+        //bring back html textarea in case we're in view mode
+        if ($("#html_view_toggle").val() == "Switch to html") {
+            $('#html_view_toggle').click()
+        }
 
         // clear storage data of the page
         localStorage.removeItem(STORAGE_PAGE_DATA_ITEM);
@@ -115,18 +118,13 @@ $( document ).ready(function() {
 
     $('#html_view_toggle').click(function(){
         obj = $(this)
+        let viewarea = $('#html_wrapper');
         if (obj.val() === 'Switch to html') {
             // use a hidden div and put the text as html() there
-            let viewarea = $('#html_wrapper');
             viewarea.html(textarea);            
             obj.val('Switch to view');
             $("#edit_page_button_row").show();
         } else {
-            let viewarea = $('#html_wrapper');
-            let width = textarea.width();
-            let height = textarea.height();
-            viewarea.width(width);
-            viewarea.height(height);
             viewarea.html(textarea.val());
             $("#edit_page_button_row").hide();
             obj.val('Switch to html');

@@ -31,7 +31,7 @@ def index(request):
 			SHORT_DESCRIPTION_LENGTH
 			)
 
-	render_params = {"greeting" : "Velkommen", "pages" : pages, 'wip_pages' : wip_pages}
+	render_params = {"greeting" : "Mer haba", "pages" : pages, 'wip_pages' : wip_pages}
 	return render(request, template_name, render_params)
 
 def show_search_list(request):
@@ -230,6 +230,3 @@ def get_last_inserted_tag(request):
 			template_name = 'page/pieces/template_new_page_tag.html'
 			render_params = {'tag_name' : tag_name}
 			return render(request, template_name, render_params)
-
-
-
