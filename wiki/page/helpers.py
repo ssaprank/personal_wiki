@@ -1,4 +1,5 @@
 """ Contains helper classes and methods for the page app """
+import re
 
 class WikiStringHelper:
 	""" Contains functions for handling string-related cases """
@@ -30,7 +31,8 @@ class WikiStringHelper:
 		if open_tag is True:
 			# last tag is still open - remove it
 			short_description = html[: full_length]
-			short_description = html[: short_description.rindex('<')]
+			opening_tag_indexes = [match.start() for match in re.finditer(r"<[a-z]+>", short_description)]
+			short_description = html[: opening_tag_indexes[-1]]
 		else:
 			short_description = html[: full_length]
 
