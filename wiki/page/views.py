@@ -13,7 +13,7 @@ from django.conf import settings
 from .models import Article, ArticleForm, Image, ImageForm, Tag
 from .helpers import WikiStringHelper
 
-HTML_TAG_ROW = ['a', 'b', 'h1', 'i', 'ul', 'li']
+HTML_TAG_ROW = ['a', 'b', 'i', 'ul', 'li', 'p', 'pre', 'code']
 HTML_TAGS_FILE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
 HTML_TAG_LIST = [x.replace("\n", "") for x in open(HTML_TAGS_FILE_PATH, 'r').readlines()]
 SHORT_DESCRIPTION_LENGTH = 300
