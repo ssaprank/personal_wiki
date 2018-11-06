@@ -176,9 +176,13 @@ $( document ).ready(function() {
             newValue += '<' + tag + '>' + '</' + tag + '>' + textAfter;
             newCaretPosition = caretPosition + tag.length + 2;
         }
+
+
+        console.log(caretPosition)
          
-        textarea.val(newValue);
+        textarea.val(textBefore);
         textarea.focus();
+        textarea.val(newValue)
 
         textarea.prop("selectionStart", newCaretPosition);
         textarea.prop("selectionEnd", newCaretPosition);

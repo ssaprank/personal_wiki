@@ -8,6 +8,7 @@ class WikiStringHelper:
 		Gets an html string and calculates the length for short description
 		Short description length = pure text length + all the tags that are in between
 		"""
+
 		pure_length_used = 0
 		full_length = 0
 		open_tag = False
@@ -15,25 +16,49 @@ class WikiStringHelper:
 
 		html = html.replace("<br/>", "").replace("<br>","")
 
-		if len(html) < pure_length:
-			pure_length = len(html) - 1
+		# do this check after regex removing all tags
+		if len(WikiStringHelper.remove_tags_from_string(html)) <= pure_length:
+			return html
 
-		while full_length <= pure_length and pure_length_used <= pure_length:
-			if html[full_length] is '<':
-				open_tag = True
-			elif html[full_length] is '>':
-				if html[full_length - 1] is '/':
-					open_tag = False
+		open_tags = []
+
+		while full_length < pure_length:
+			if html[0] is '<':
+				closing_brace_index = html.find(">")
+				if html[1] is '/':
+					tag_name = html[2:closing_brace_index]
+					open_tags.remove(tag_name)
+					short_description += html[:closing_brace_index+1]
+				else:
+					short_description += html[:closing_brace_index+1]
+					tag_name = html[1:closing_brace_index]
+					open_tags.append(tag_name)
+				html = html[closing_brace_index+1:]
 			else:
-				pure_length_used += 1
-			full_length += 1
+				short_description += html[0]
+				full_length += 1
+				html = html[1:]
 
-		if open_tag is True:
-			# last tag is still open - remove it
-			short_description = html[: full_length]
-			opening_tag_indexes = [match.start() for match in re.finditer(r"<[a-z]+>", short_description)]
-			short_description = html[: opening_tag_indexes[-1]]
-		else:
-			short_description = html[: full_length]
+		for tag in reversed(open_tags):
+			short_description += "</" + tag + ">"
 
 		return short_description
+
+
+
+	def remove_tags_from_string(input):
+		return re.sub(r"<\/?[^<>]+>", "", input)
+
+# take pure_length substring
+# using regex find all <.*> and </.*> matches in the substr
+# while there are elements in </.*> matches
+# 	find according </.*> match, remove both
+# add closing tags for all remaining <.*> matches
+
+
+
+# go through chars 1 by 1
+# if <.*> encountered - mem it
+# if </.*> encountered - forget according <.*> match
+# if normal char encountered - count it and continue
+# do while counter < pure_length
