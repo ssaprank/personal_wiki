@@ -1,4 +1,0 @@
-[
-  "page/tests/test_helper.py::test_short_description",
-  "page/tests/test_helper.py::test_remove_tags_from_string"
-]
