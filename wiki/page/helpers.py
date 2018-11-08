@@ -13,7 +13,7 @@ class WikiStringHelper:
 		open_tag = False
 		short_description = ''
 
-		html = html.replace("<br/>", "").replace("<br>","")
+		html = html.replace("<br/>", "").replace("<br>","").replace("<hr>","")
 
 		# do this check after regex removing all tags
 		if len(WikiStringHelper.remove_tags_from_string(html)) <= pure_length:
@@ -24,13 +24,19 @@ class WikiStringHelper:
 		while full_length < pure_length:
 			if html[0] is '<':
 				closing_brace_index = html.find(">")
+				next_space_index = html.find(" ")
 				if html[1] is '/':
 					tag_name = html[2:closing_brace_index]
 					open_tags.remove(tag_name)
 					short_description += html[:closing_brace_index+1]
 				else:
 					short_description += html[:closing_brace_index+1]
-					tag_name = html[1:closing_brace_index]
+
+					tag_name_index = min(closing_brace_index, next_space_index) \
+						if next_space_index > -1 \
+							else closing_brace_index
+
+					tag_name = html[1:tag_name_index]
 					open_tags.append(tag_name)
 				html = html[closing_brace_index+1:]
 			else:

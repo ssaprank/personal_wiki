@@ -16,7 +16,7 @@ from .helpers import WikiStringHelper
 HTML_TAG_ROW = ['a', 'b', 'i', 'ul', 'li', 'p', 'pre', 'code']
 HTML_TAGS_FILE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
 HTML_TAG_LIST = [x.replace("\n", "") for x in open(HTML_TAGS_FILE_PATH, 'r').readlines()]
-SHORT_DESCRIPTION_LENGTH = 300
+SHORT_DESCRIPTION_LENGTH = 220
 
 def index(request):
 	"""Main view - list all pages"""

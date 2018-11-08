@@ -7,7 +7,8 @@ testdata_short_description = [
 	('<ul><li>first list, first element</li></ul>some text before the paragraph<p>paragraph</p><ul><li>second list first element</li></ul>', '<ul><li>first list, first element</li></ul>some text before the paragraph<p>parag</p>', 60),
 	('<h2>Basic HTML Table</h2><table><tr><th>Firstname</th><th>Age</th></tr><tr><td>Jill</td><td>50</td></tr><tr><td>Eve</td><td>94</td></tr><tr><td>John</td><td>Doe</td></tr></table>', '<h2>Basic HTML Table</h2><table><tr><th>Firstname</th><th>Age</th></tr><tr><td>Ji</td></tr></table>', 30),
 	('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor', 80),
-	('<h2>Basic HTML Table</h2><table><tr><th>Firstname</th><th>Age</th></tr><tr><td>Jill</td><td>50</td></tr><tr><td>Eve</td><td>94</td></tr><tr><td>John</td><td>Doe</td></tr></table>', '<h2>Basic HTML Table</h2><table><tr><th>Firstname</th><th>Age</th></tr><tr><td>Jill</td><td>50</td></tr><tr><td>Eve</td><td>94</td></tr><tr><td>John</td><td>Doe</td></tr></table>', 60)
+	('<h2>Basic HTML Table</h2><table><tr><th>Firstname</th><th>Age</th></tr><tr><td>Jill</td><td>50</td></tr><tr><td>Eve</td><td>94</td></tr><tr><td>John</td><td>Doe</td></tr></table>', '<h2>Basic HTML Table</h2><table><tr><th>Firstname</th><th>Age</th></tr><tr><td>Jill</td><td>50</td></tr><tr><td>Eve</td><td>94</td></tr><tr><td>John</td><td>Doe</td></tr></table>', 60),
+	('<div attr1="zalupa" attr2="huj">ночь пришла, а за ней гроза. Грустный дождь да ветер шутник.</div>', '<div attr1="zalupa" attr2="huj">ночь пришл</div>', 10)
 ]
 
 testdata_remove_tags = [
