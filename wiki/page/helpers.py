@@ -5,10 +5,9 @@ class WikiStringHelper:
 	""" Contains functions for handling string-related cases """
 	def get_article_short_description(html, pure_length):
 		"""
-		Gets an html string and calculates the length for short description
-		Short description length = pure text length + all the tags that are in between
+		Gets an html string and returns the substr of it, consisting of
+		pure_length number of chars + tags that come in between
 		"""
-
 		pure_length_used = 0
 		full_length = 0
 		open_tag = False
@@ -44,21 +43,5 @@ class WikiStringHelper:
 
 		return short_description
 
-
-
 	def remove_tags_from_string(input):
 		return re.sub(r"<\/?[^<>]+>", "", input)
-
-# take pure_length substring
-# using regex find all <.*> and </.*> matches in the substr
-# while there are elements in </.*> matches
-# 	find according </.*> match, remove both
-# add closing tags for all remaining <.*> matches
-
-
-
-# go through chars 1 by 1
-# if <.*> encountered - mem it
-# if </.*> encountered - forget according <.*> match
-# if normal char encountered - count it and continue
-# do while counter < pure_length

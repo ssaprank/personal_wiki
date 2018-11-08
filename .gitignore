@@ -3,3 +3,4 @@ lib/
 htmlcov/
 \.coverage
 __pycache__/
+db.sqlite3
