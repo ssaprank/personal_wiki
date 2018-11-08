@@ -1,4 +1,4 @@
-from ..helpers import WikiStringHelper
+from ..helpers import WikiStringHelper, KanaHelper
 
 import pytest
 
@@ -15,6 +15,13 @@ testdata_remove_tags = [
 	('<br/>text<h1>header</h1><p>paragraph text</p>again plain text<br/>and<div style="width:10px;">div with styling</div>', 'textheaderparagraph textagain plain textanddiv with styling')
 ]
 
+testdata_rus_to_hiragana = [
+	#('дэванайдэсу', 'でわないです'),
+	#('тётта', 'ちょった'),
+	('а', 'あ'),
+	('ауёо', 'あうよお'),
+	('каки', 'かき')
+]
 
 @pytest.mark.parametrize("html,expected_short_description,pure_length", testdata_short_description)
 def test_short_description(html, expected_short_description, pure_length):
@@ -27,3 +34,9 @@ def test_remove_tags_from_string(tagged_string, expected_output):
 	actual_string = WikiStringHelper.remove_tags_from_string(tagged_string)
 
 	assert expected_output == actual_string
+
+@pytest.mark.parametrize("rus_transcription,expected_hiragana", testdata_rus_to_hiragana)
+def test_rus_to_hiragana(rus_transcription, expected_hiragana):
+	actual_hiragana = KanaHelper.rus_to_hiragana(rus_transcription)
+
+	assert expected_hiragana == actual_hiragana
