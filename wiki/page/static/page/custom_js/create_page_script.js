@@ -116,6 +116,35 @@ $( document ).ready(function() {
         insertTag(tag);
     });
 
+    $("#btn_rus_to_hira").click(function(){
+        sendPolivanovTranslationRequestForSelectedText('rus', 'hiragana')
+    });
+
+    $("#btn_rus_to_kata").click(function(){
+        sendPolivanovTranslationRequestForSelectedText('rus', 'katakana')
+    });
+
+    function sendPolivanovTranslationRequestForSelectedText(source, target)
+    {
+        let textarea = $('#id_html');
+        textarea.focus()
+        let startPos = textarea.prop("selectionStart");
+        let endPos = textarea.prop("selectionEnd");
+
+        let selectedText = textarea.val().substring(startPos, endPos);
+
+        $.get({
+            url: API_ENDPOINT + "get_polivanov_translation",
+            data: {'word' : selectedText, 'source' : source, 'target' : target},
+            success: function(data) {
+                if (data.result != "") {
+                    newValue = textarea.val().substring(0, startPos) + data.result + textarea.val().substring(endPos)
+                    textarea.val(newValue)
+                }
+            }
+        });
+    }
+
     $('#html_view_toggle').click(function(){
         obj = $(this)
         let viewarea = $('#html_wrapper');
@@ -156,7 +185,6 @@ $( document ).ready(function() {
             }
         }
     });
-
 
     function insertTag(tag)
     {

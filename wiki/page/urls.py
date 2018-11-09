@@ -22,4 +22,8 @@ urlpatterns = [ #pylint: disable=invalid-name
     	views.get_last_inserted_tag,
     	name='get_last_inserted_tag'
     	),
+    re_path(r'^api/get_polivanov_translation/',
+        views.get_polivanov_translation,
+        name='get_polivanov_translation'
+        ),
 ]

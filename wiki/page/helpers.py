@@ -53,7 +53,20 @@ class WikiStringHelper:
 		return re.sub(r"<\/?[^<>]+>", "", input)
 
 class KanaHelper:
+	def perform_polivanov_convertation(word, source, target):
+		if source == 'rus':
+			if target == 'hiragana':
+				return KanaHelper.rus_to_hiragana(word)
+			elif target == 'katakana':
+				return KanaHelper.rus_to_katakana(word)
+
+	def rus_to_katakana(string):
+		return KanaHelper.rus_to_kana(string, 1)
+
 	def rus_to_hiragana(string):
+		return KanaHelper.rus_to_kana(string, 0)
+
+	def rus_to_kana(string, kanaIndex):
 		string = string.strip().lower()
 		output = ''
 
@@ -63,7 +76,6 @@ class KanaHelper:
 			polivanov_row = POLIVANOV_SYSTEM.get(c, '')
 
 			if polivanov_row == '':
-				#todo raise exception
 				return output
 
 			# both n and m can be expressed using ん if followed by a consonant
@@ -73,23 +85,23 @@ class KanaHelper:
 				else:
 					cc = ''
 
-				polivanov_col = polivanov_row.get(cc, N_SYMBOL[0])
-				output += polivanov_col[0]
+				polivanov_col = polivanov_row.get(cc, N_SYMBOL[kanaIndex])
 
-				string_last_char = string[0] if polivanov_col is N_SYMBOL[0] or len(string) <= 1 else string[1]
-				string = string[1:] if polivanov_col is N_SYMBOL[0] else string[2:]
+				output += polivanov_col if polivanov_col == N_SYMBOL[kanaIndex] else polivanov_col[kanaIndex]
+
+				string_last_char = string[0] if polivanov_col is N_SYMBOL[kanaIndex] or len(string) <= 1 else string[1]
+				string = string[1:] if polivanov_col is N_SYMBOL[kanaIndex] else string[2:]
 
 			elif isinstance(polivanov_row, dict):
 				cc = string[1]
 
 				if cc == c:
-					output += CONSONANT_EXTENSION_SYMBOL
+					output += CONSONANT_EXTENSION_SYMBOL[kanaIndex]
 					string = string[1:]
 				else:
 					polivanov_col = polivanov_row.get(cc, None)
 
 					if polivanov_col is None:
-						#todo raise exception
 						return output
 
 					if isinstance(polivanov_col, dict):
@@ -97,19 +109,18 @@ class KanaHelper:
 						polivanov_col = polivanov_col.get(ccc, None)
 
 						if polivanov_col is None:
-							#todo raise exception
 							return output
 
-						output += polivanov_col[0]
+						output += polivanov_col[kanaIndex]
 						string_last_char = string[2]
 						string = string[3:]
 
 					else:
-						output += polivanov_col[0]
+						output += polivanov_col[kanaIndex]
 						string_last_char = string[1]
 						string = string[2:]
 			else:
-				output += polivanov_row[0]
+				output += polivanov_row[kanaIndex]
 				string_last_char = string[0]
 				string = string[1:]
 
@@ -117,12 +128,12 @@ class KanaHelper:
 				next_char = string[0]
 				last_char_instance = POLIVANOV_SYSTEM.get(string_last_char, None)
 				if next_char in [string_last_char, ':'] and not isinstance(last_char_instance, dict):
-					output += VOCAL_EXTENSION_SYMBOLS_HIRAGANA.get(string_last_char, '')
+					output += VOCAL_EXTENSION_SYMBOLS_HIRAGANA.get(string_last_char, '') if kanaIndex == 0 else VOCAL_EXTENSION_SYMBOL_KATAKANA
 					string = string[1:]
 
 		return output
 
-CONSONANT_EXTENSION_SYMBOL = 'っ'
+CONSONANT_EXTENSION_SYMBOL = ['っ', 'ン']
 VOCAL_EXTENSION_SYMBOLS_HIRAGANA = {'а' : 'あ', 'и' : 'い', 'у' : 'う', 'э' : 'え', 'о' : 'う', 'я' : 'あ', 'ю' : 'う', 'ё' : 'え'}
 N_SYMBOL = ['ん', 'ン']
 VOCAL_EXTENSION_SYMBOL_KATAKANA = 'ー'

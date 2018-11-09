@@ -17,10 +17,18 @@ testdata_remove_tags = [
 
 testdata_rus_to_hiragana = [
 	('дэванайдэсу', 'でわないです'), ('кацумото', 'かつもと'), ('тётта', 'ちょった'),
-	('а', 'あ'), ('ауёо', 'あうよお'), ('каки', 'かき'), ('сёгу', 'しょぐ'), ('сёгун', 'しょぐん'),
+	('а', 'あ'), ('ауёо', 'あうよお'), ('каки', 'かき'), ('сёгун', 'しょぐん'),
 	('гамбару', 'がんばる'), ('дзюнитаки', 'じゅにたき'), ('дакутэн', 'だくてん'),
 	('коохии', 'こうひい'), ('яСУМИ', 'やすみ'), ('киССАТЭН', 'きっさてん'), ('дзё:ДЗУ', 'じょえず'),
 	('аТАРАСИй', 'あたらしい'), ('дэНВАБАнго:', 'でんわばんごう'), ('ниой', 'におい'), ('ниппон', 'にっぽん')
+]
+
+testdata_rus_to_katakana = [
+	('дэванайдэсу', 'デワナイデス'), ('кацумото', 'カツモト'), ('тётта', 'チョンタ'),
+	('а', 'ア'), ('ауёо', 'アウヨオ'), ('каки', 'カキ'), ('сёгун', 'ショグン'),
+	('гамбару', 'ガンバル'), ('дзюнитаки', 'ジュニタキ'), ('дакутэн', 'ダクテン'),
+	('коохии', 'コーヒー'), ('яСУМИ', 'ヤスミ'), ('киССАТЭН', 'キンサテン'), ('дзё:ДЗУ', 'ジョーズ'),
+	('аТАРАСИй', 'アタラシイ'), ('дэНВАБАнго:', 'デンワバンゴー'), ('ниой', 'ニオイ'), ('ниппон', 'ニンポン')
 ]
 
 @pytest.mark.parametrize("html,expected_short_description,pure_length", testdata_short_description)
@@ -40,3 +48,9 @@ def test_rus_to_hiragana(rus_transcription, expected_hiragana):
 	actual_hiragana = KanaHelper.rus_to_hiragana(rus_transcription)
 
 	assert expected_hiragana == actual_hiragana
+
+@pytest.mark.parametrize("rus_transcription,expected_katakana", testdata_rus_to_katakana)
+def test_rus_to_katakana(rus_transcription, expected_katakana):
+	actual_katakana = KanaHelper.rus_to_katakana(rus_transcription)
+
+	assert expected_katakana == actual_katakana

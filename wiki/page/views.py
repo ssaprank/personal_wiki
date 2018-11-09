@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from .models import Article, ArticleForm, Image, ImageForm, Tag
-from .helpers import WikiStringHelper
+from .helpers import WikiStringHelper, KanaHelper
 
 HTML_TAG_ROW = ['a', 'b', 'i', 'ul', 'li', 'p', 'pre', 'code']
 HTML_TAGS_FILE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/static/page/html_tag_list.txt'
@@ -230,3 +230,14 @@ def get_last_inserted_tag(request):
 			template_name = 'page/pieces/template_new_page_tag.html'
 			render_params = {'tag_name' : tag_name}
 			return render(request, template_name, render_params)
+
+def get_polivanov_translation(request):
+	if request.is_ajax():
+		word = request.GET.get('word', '')
+		source = request.GET.get('source', '')
+		target = request.GET.get('target', '')
+		if word == '' or source == '' or target == '':
+			data = {'result' : ''}
+		else:
+			data = {'result' : KanaHelper.perform_polivanov_convertation(word, source, target)}
+		return JsonResponse(data)
