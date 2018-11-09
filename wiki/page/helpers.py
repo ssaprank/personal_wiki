@@ -54,44 +54,83 @@ class WikiStringHelper:
 
 class KanaHelper:
 	def rus_to_hiragana(string):
-		string = string.strip()
+		string = string.strip().lower()
 		output = ''
 
 		while(len(string) > 0):
 			c = string[0]
+			string_last_char = string[0]
 			polivanov_row = POLIVANOV_SYSTEM.get(c, '')
 
 			if polivanov_row == '':
 				#todo raise exception
 				return output
 
-			if isinstance(polivanov_row, dict):
+			# both n and m can be expressed using ん if followed by a consonant
+			if c == 'н' or c == 'м':
+				if len(string) > 1:
+					cc = string[1]
+				else:
+					cc = ''
+
+				polivanov_col = polivanov_row.get(cc, N_SYMBOL[0])
+				output += polivanov_col[0]
+
+				string_last_char = string[0] if polivanov_col is N_SYMBOL[0] or len(string) <= 1 else string[1]
+				string = string[1:] if polivanov_col is N_SYMBOL[0] else string[2:]
+
+			elif isinstance(polivanov_row, dict):
 				cc = string[1]
 
 				if cc == c:
-					# consonant doubling - handle it with appropriate symbol
-					pass
+					output += CONSONANT_EXTENSION_SYMBOL
+					string = string[1:]
+				else:
+					polivanov_col = polivanov_row.get(cc, None)
 
-				polivanov_col = polivanov_row.get(cc, '')
+					if polivanov_col is None:
+						#todo raise exception
+						return output
 
-				if polivanov_col == '':
-					#todo raise exception
-					return output
+					if isinstance(polivanov_col, dict):
+						ccc = string[2]
+						polivanov_col = polivanov_col.get(ccc, None)
 
-				output += polivanov_col[0]
-				string = string[2:]
+						if polivanov_col is None:
+							#todo raise exception
+							return output
+
+						output += polivanov_col[0]
+						string_last_char = string[2]
+						string = string[3:]
+
+					else:
+						output += polivanov_col[0]
+						string_last_char = string[1]
+						string = string[2:]
 			else:
 				output += polivanov_row[0]
+				string_last_char = string[0]
 				string = string[1:]
+
+			if len(string) >= 1:
+				next_char = string[0]
+				last_char_instance = POLIVANOV_SYSTEM.get(string_last_char, None)
+				if next_char in [string_last_char, ':'] and not isinstance(last_char_instance, dict):
+					output += VOCAL_EXTENSION_SYMBOLS_HIRAGANA.get(string_last_char, '')
+					string = string[1:]
 
 		return output
 
-# дз* символы
-# н
-# удвоение согл и гл
+CONSONANT_EXTENSION_SYMBOL = 'っ'
+VOCAL_EXTENSION_SYMBOLS_HIRAGANA = {'а' : 'あ', 'и' : 'い', 'у' : 'う', 'э' : 'え', 'о' : 'う', 'я' : 'あ', 'ю' : 'う', 'ё' : 'え'}
+N_SYMBOL = ['ん', 'ン']
+VOCAL_EXTENSION_SYMBOL_KATAKANA = 'ー'
+
 POLIVANOV_SYSTEM = {
 	'а' : ['あ', 'ア'],
 	'и' : ['い', 'イ'],
+	'й' : ['い', 'イ'],
 	'у' : ['う', 'ウ'],
 	'э' : ['え', 'エ'],
 	'о' : ['お', 'オ'],
@@ -101,16 +140,19 @@ POLIVANOV_SYSTEM = {
 	'к' : {'а' : ['か', 'カ'], 'и' : ['き', 'キ'], 'у' : ['く', 'ク'], 'э' : ['け', 'ケ'], 'о' : ['こ', 'コ'], 'я' : ['きゃ', 'キャ'], 'ю' : ['きゅ', 'キュ'], 'ё' : ['きょ', 'キョ']},
 	'г' : {'а' : ['が', 'ガ'], 'и' : ['ぎ', 'ギ'], 'у' : ['ぐ', 'グ'], 'э' : ['げ', 'ゲ'], 'о' : ['ご', 'ゴ'], 'я' : ['ぎゃ', 'ギャ'], 'ю' : ['ぎゅ', 'ギュ'], 'ё' : ['ぎょ', 'ギョ']},
 	'с' : {'а' : ['さ', 'サ'], 'и' : ['し', 'シ'], 'у' : ['す', 'ス'], 'э' : ['せ', 'セ'], 'о' : ['そ', 'ソ'], 'я' : ['しゃ', 'シャ'], 'ю' : ['しゅ', 'シュ'], 'ё' : ['しょ', 'ショ']},
-	'дз': {'а' : ['ざ', 'ザ'], 'и' : ['じ', 'ジ'], 'у' : ['ず', 'ズ'], 'э' : ['ぜ', 'ゼ'], 'о' : ['ぞ', 'ゾ'], 'я' : ['じゃ', 'ジャ'], 'ю' : ['じゅ', 'ジュ'], 'ё' : ['じょ', 'ジョ']},
 	'т' : {'а' : ['た', 'タ'], 'и' : ['ち', 'チ'], 'э' : ['て', 'テ'], 'о' : ['と', 'ト'], 'я' : ['ちゃ', 'チャ'], 'ю' : ['ちゅ', 'チュ'], 'ё' : ['ちょ', 'チョ']},
 	'ц' : {'у' : ['つ', 'ツ']},
-	'д' : {'а' : ['だ', 'ダ'], 'зи' : ['ぢ', 'ヂ'], 'зу' : ['づ', 'ヅ'], 'э' : ['で', 'デ'], 'о' : ['ど', 'ド'], 'зя' : ['ぢゃ', 'ヂャ'], 'зю' : ['ぢゅ', 'ヂュ'], 'зё' : ['ぢょ', 'ヂョ']},
-	'н' : {'н' : ['ん', 'ン'], 'а' : ['な', 'ナ'], 'и' : ['に', 'ニ'], 'у' : ['ぬ', 'ヌ'], 'э' : ['ね', 'ネ'], 'о' : ['の', 'ノ'], 'я' : ['にゃ', 'ニャ'], 'ю' : ['にゅ', 'ニュ'], 'ё' : ['にょ', 'ニョ']},
+	# ряд "дз" добавлен в ряд "д"
+	#'дз': {'а' : ['ざ', 'ザ'], 'и' : ['じ', 'ジ'], 'у' : ['ず', 'ズ'], 'э' : ['ぜ', 'ゼ'], 'о' : ['ぞ', 'ゾ'], 'я' : ['じゃ', 'ジャ'], 'ю' : ['じゅ', 'ジュ'], 'ё' : ['じょ', 'ジョ']},
+	# полный вариант записи этого ряда - вычеркнут, так как многие его звуки дублируются рядом "дз"
+	#'д' : {'а' : ['だ', 'ダ'], 'зи' : ['ぢ', 'ヂ'], 'зу' : ['づ', 'ヅ'], 'э' : ['で', 'デ'], 'о' : ['ど', 'ド'], 'зя' : ['ぢゃ', 'ヂャ'], 'зю' : ['ぢゅ', 'ヂュ'], 'зё' : ['ぢょ', 'ヂョ']},
+	'д' : {'а' : ['だ', 'ダ'], 'э' : ['で', 'デ'], 'о' : ['ど', 'ド'], 'з' : {'а' : ['ざ', 'ザ'], 'и' : ['じ', 'ジ'], 'у' : ['ず', 'ズ'], 'э' : ['ぜ', 'ゼ'], 'о' : ['ぞ', 'ゾ'], 'я' : ['じゃ', 'ジャ'], 'ю' : ['じゅ', 'ジュ'], 'ё' : ['じょ', 'ジョ']}},
+	'н' : {'' : ['ん', 'ン'], 'а' : ['な', 'ナ'], 'и' : ['に', 'ニ'], 'у' : ['ぬ', 'ヌ'], 'э' : ['ね', 'ネ'], 'о' : ['の', 'ノ'], 'я' : ['にゃ', 'ニャ'], 'ю' : ['にゅ', 'ニュ'], 'ё' : ['にょ', 'ニョ']},
 	'х' : {'а' : ['は', 'ハ'], 'и' : ['ひ', 'ヒ'], 'э' : ['へ', 'へ'], 'о' : ['ほ', 'ホ'], 'я' : ['ひゃ', 'ヒャ'], 'ю' : ['ひゅ', 'ヒュ'], 'ё' : ['ひょ', 'ヒョ']},
 	'ф' : {'у' : ['ふ', 'フ']},
 	'б' : {'а' : ['ば', 'バ'], 'и' : ['び', 'ビ'], 'у' : ['ぶ', 'ブ'], 'э' : ['べ', 'べ'], 'о' : ['ぼ', 'ボ'], 'я' : ['びゃ', 'ビャ'], 'ю' : ['びゅ', 'ビュ'], 'ё' : ['びょ', 'ビョ']},
 	'п' : {'а' : ['ぱ', 'パ'], 'и' : ['ぴ', 'ピ'], 'у' : ['ぷ', 'プ'], 'э' : ['ぺ', 'ぺ'], 'о' : ['ぽ', 'ポ'], 'я' : ['ぴゃ', 'ピャ'], 'ю' : ['ぴゅ', 'ピュ'], 'ё' : ['ぴょ', 'ピョ']},
-	'м' : {'а' : ['ま', 'マ'], 'и' : ['み', 'ミ'], 'у' : ['む', 'ム'], 'э' : ['め', 'メ'], 'о' : ['も', 'モ'], 'я' : ['みゃ', 'ミャ'], 'ю' : ['みゅ', 'ミュ'], 'ё' : ['みょ', 'ミョ']},
+	'м' : {'' : ['ん', 'ン'], 'а' : ['ま', 'マ'], 'и' : ['み', 'ミ'], 'у' : ['む', 'ム'], 'э' : ['め', 'メ'], 'о' : ['も', 'モ'], 'я' : ['みゃ', 'ミャ'], 'ю' : ['みゅ', 'ミュ'], 'ё' : ['みょ', 'ミョ']},
 	'р' : {'а' : ['ら', 'ラ'], 'и' : ['り', 'リ'], 'у' : ['る', 'ル'], 'э' : ['れ', 'レ'], 'о' : ['ろ', 'ロ'], 'я' : ['りゃ', 'リャ'], 'ю' : ['りゅ', 'リュ'], 'ё' : ['りょ', 'リョ']},
 	'в' : {'а' : ['わ', 'ワ'], 'о' : ['を', 'ヲ']}
 }
