@@ -5,7 +5,7 @@
 				<h5 class="mb-1 list_article_title text-dark">{{page.title}}</h5>
 				<small><i>Last modified: {{page.last_modified}}</i></small>
 			</div>
-			<div class="mb-1">
+			<div class="mb-1 w-75" style="overflow-wrap: break-word;">
 				{% autoescape off %}
 					{{page.short_description}}
 				{% endautoescape %}

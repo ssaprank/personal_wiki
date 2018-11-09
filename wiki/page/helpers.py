@@ -13,8 +13,6 @@ class WikiStringHelper:
 		open_tag = False
 		short_description = ''
 
-		html = html.replace("<br/>", "").replace("<br>","").replace("<hr>","")
-
 		# do this check after regex removing all tags
 		if len(WikiStringHelper.remove_tags_from_string(html)) <= pure_length:
 			return html
@@ -50,7 +48,7 @@ class WikiStringHelper:
 		return short_description
 
 	def remove_tags_from_string(input):
-		return re.sub(r"<\/?[^<>]+>", "", input)
+		return re.sub(r"<\/?[^<>]+\/?>", "", input)
 
 class KanaHelper:
 	def perform_polivanov_convertation(word, source, target):
