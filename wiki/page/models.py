@@ -55,7 +55,7 @@ class ArticleForm(ModelForm):
 		model = Article
 		widgets = {
 			'html': Textarea(attrs={'cols' : '80', 'rows' : '20', 'class' : 'form-control'}),
-			'title' : TextInput(attrs={'class' : 'form-control'})
+			'title' : TextInput(attrs={'class' : 'form-control', 'style' : 'height: 60px; font-size:20pt;'})
 		}
 		fields = ['title', 'html', 'work_in_progress']
 		labels = {

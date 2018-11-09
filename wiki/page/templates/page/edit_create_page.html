@@ -27,15 +27,19 @@
     <form method="POST" action="{% url 'page:create' %}" id="edit_page_form">
 {% endif %}
 {% csrf_token %}
-        <div class="row mt-2">
+        <div class="d-inline row">
             <div class="col">
-                {{page_form.title.label}} : &nbsp;
+                <font size="+3">
+                    <pre> {{page_form.title.label}}:</pre>
+                </font>
                 {{page_form.title}}
             </div>
         </div>
         <div class="d-inline row mt-3">
             <div class="col-lg" id="html_wrapper">
-                {{page_form.html.label}} : &nbsp;
+                <font size="+2">
+                    <pre> {{page_form.html.label}}: &nbsp;</pre>
+                </font>
                 {{page_form.html}}
             </div>
         </div>
@@ -62,21 +66,14 @@
                        data-url="{% url 'page:upload_image' %}"
                        data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'/>
 
+                <!-- Button for triggering image insertion modal -->
                 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#imagesInsertionModal">
                     Insert Images
                 </button>
-            </div>
-            <div class="col-sm-2 float-right mr-2">
-                <button type="button" id="btn_rus_to_hira" name="btn_rus_to_hira" class="btn btn-secondary mb-2">
-                    Convert to Hiragana
-                </button>
 
-                <button type="button" id="btn_rus_to_kata" name="btn_rus_to_kata" class="btn btn-secondary">
-                    Convert to Katakana
-                </button>
             </div>
         </div>
-        <div class="button_row row mt-lg-3">
+        <div class="button_row row mt-lg-2">
             <div class="col">
                 <input type="button" id="html_view_toggle" value="Switch to view" class="btn btn-primary"/>
             </div>
