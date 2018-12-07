@@ -1,3 +1,5 @@
+{% load wiki_templates_extras %}
+
 {% if pages is not None %}
 	{% for page in pages %}
 		<a href="{% url 'page:show' page_id=page.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
@@ -10,6 +12,13 @@
 					{{page.short_description}}
 				{% endautoescape %}
 			</div>
+			{% if page.tag_set.all.count > 0 %}
+				<div class="mb-1">
+					<span class="font-weight-bold">Tags:</span>
+					{{ page.tag_set|tags_to_string }}
+				</div>
+				<hr/>
+			{% endif %}
 		</a>
 		<br/>
 	{% endfor %}

@@ -22,7 +22,7 @@ def index(request):
 	"""Main view - list all pages"""
 	template_name = 'page/home.html'
 
-	pages = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:5]
+	pages = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:20]
 	wip_pages = Article.objects.filter(work_in_progress=True)
 
 	for page in pages:
@@ -31,7 +31,7 @@ def index(request):
 			SHORT_DESCRIPTION_LENGTH
 			)
 
-	render_params = {"greeting" : "", "pages" : pages, 'wip_pages' : wip_pages}
+	render_params = {"pages" : pages, 'wip_pages' : wip_pages}
 	return render(request, template_name, render_params)
 
 def show_search_list(request):

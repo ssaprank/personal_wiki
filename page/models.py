@@ -35,9 +35,9 @@ class Tag(models.Model):
 		string = "Name : %s" % (self.name)
 
 		if self.articles.all().count() > 0:
-			string += " Articles:"
+			string += " Articles: "
 			for article in self.articles.all():
-				string += article.title
+				string += article.title + "; "
 
 		return string
 

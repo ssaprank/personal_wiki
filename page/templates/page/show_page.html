@@ -1,5 +1,6 @@
 {% extends './base.html' %}
 {% load staticfiles %}
+{% load wiki_templates_extras %}
 
 {% block content %}
 <div class="row mt-lg-2 article_header">
@@ -28,7 +29,7 @@
 	<div class="col">
 		<p>
 			<span class="font-weight-bold">Tags:</span>
-			{% for tag in page_object.tag_set.all %} {{ tag.name }} {% endfor %}
+			{{ page_object.tag_set|tags_to_string }}
 		</p>
 	</div>
 </div>
