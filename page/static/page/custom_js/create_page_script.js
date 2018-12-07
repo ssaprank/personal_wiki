@@ -3,7 +3,7 @@ const STORAGE_PAGE_DATA_ITEM = "page_data";
 const API_ENDPOINT = "http://127.0.0.1:8000/api/";
 // if true - the page is being submitted, so no data should be written to the local storage
 var pageBeingSubmitted = false;
-
+var editMode = true;
 
 $( document ).ready(function() {
     var textarea = $('#id_html');
@@ -33,6 +33,7 @@ $( document ).ready(function() {
     window.onload = function() {
         current_url = window.location.pathname;
         pageBeingSubmitted = false;
+        $("#hidden_intermediary_form_save").val(0);
 
         // if we just loaded create or edit page view
         if (/^\/(\d+\/edit|create)$/.test(current_url)) {
@@ -58,10 +59,40 @@ $( document ).ready(function() {
         }
     }
 
+    // prevent submitting the form on each Enter pressing inside of it
     $("#edit_page_form").keydown(function(e) {
         if (e.keyCode == 13 && !(textarea.is(":focus"))) {
             e.preventDefault();
             return false;
+        }
+    });
+
+    $("#id_html").keydown(function(e) {
+        if (!editMode) {
+            return;
+        }
+
+        if (e.keyCode === 9) {
+        // Prevent leaving textarea by pressing tab
+            e.preventDefault();
+            let textarea = $(this);
+
+            let start = textarea.prop("selectionStart");
+            let end = textarea.prop("selectionEnd");
+
+            console.log(start)
+            console.log(end)
+            let value = textarea.val();
+            textarea.val(value.substring(0, start) + "\t" + value.substring(end));
+
+            textarea.prop("selectionStart", start + 1);
+            textarea.prop("selectionEnd", start + 1);
+        } else if (e.keyCode == 83 && e.ctrlKey) {
+            // Now save the content of the textarea in case Ctrl+S were pressed
+            e.preventDefault();
+            console.log("saving");
+            $("#hidden_intermediary_form_save").val(1);
+            $("#submit").click();
         }
     });
 
@@ -158,6 +189,8 @@ $( document ).ready(function() {
             $("#edit_page_button_row").hide();
             obj.val('Switch to html');
         }
+
+        editMode = !editMode;
     });
 
     $("#html_tag_list").change(function() {

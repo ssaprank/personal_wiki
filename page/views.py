@@ -88,6 +88,7 @@ def edit_page(request, page_id):
 			page_object = Article.objects.get(id=new_form_id)
 
 			hidden_tags_input_list = hidden_tags_input.split(",")
+			intermediary_save = request.POST.get('hidden_intermediary_form_save', 0)
 
 			for page_tag in page_tags:
 				if page_tag.name not in hidden_tags_input_list:
@@ -95,7 +96,14 @@ def edit_page(request, page_id):
 					if page_tag.articles.all().count() == 0:
 						page_tag.delete()
 
-			return redirect('page:index')
+			if int(intermediary_save) > 0:
+				render_params['page_form'] = page_form
+				if hidden_tags_input:
+					render_params['page_tags'] = hidden_tags_input.split(',')
+					render_params['page_associated_tags'] = hidden_tags_input
+				return render(request, template_name, render_params)
+			else:
+				return redirect('page:index')
 		else:
 			render_params['page_associated_tags'] = hidden_tags_input
 			render_params['page_form'] = page_form
@@ -129,9 +137,17 @@ def create_page(request):
 
 		if page_form.is_valid():
 			hidden_tags_input = request.POST.get('hidden_page_tags_input', '')
+			intermediary_save = request.POST.get('hidden_intermediary_form_save', 0)
 			save_page_form(page_form, hidden_tags_input)
 
-			return redirect('page:index')
+			if int(intermediary_save) > 0:
+				render_params['page_form'] = page_form
+				if hidden_tags_input:
+					render_params['page_tags'] = hidden_tags_input.split(',')
+					render_params['page_associated_tags'] = hidden_tags_input
+				return render(request, template_name, render_params)
+			else:
+				return redirect('page:index')
 		else:
 			render_params['page_form'] = page_form
 			render_params['form_errors'] = page_form.errors
