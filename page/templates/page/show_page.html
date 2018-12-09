@@ -43,7 +43,7 @@
 		<a class="badge badge-secondary p-2 link-button-normal" href="{% url 'page:index' %}"><img src="{% static 'page/images/back_arrow.png' %}"/> Back to main page</a>
 	</div>
 	<div class="col-sm-2">
-		<a class="badge badge-danger p-2 link-button-delete" href="{% url 'page:delete' page_id=page_object.id %}"><img src="{% static 'page/images/delete_symbol.png' %}"/> Delete page</a>
+		<button class="btn btn-danger p-2 link-button-delete" data-toggle="modal" data-target="#page_deletion_modal_prompt"><img src="{% static 'page/images/delete_symbol.png' %}"/>Delete page</button>
 	</div>
 </div>
 {% endblock %}

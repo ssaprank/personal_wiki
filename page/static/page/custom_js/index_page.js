@@ -45,7 +45,14 @@ $( document ).ready(function() {
 	});
 
 	$("#modal_submit_page_deletion").click(function(e) {
-		let url = $("#wip_article_select").val() + "/delete";
+		let url = '';
+
+		if ($("#wip_article_select").length > 0) {
+			url = $("#wip_article_select").val() + "/delete"
+		} else {
+			url = window.location.href + 'delete';
+		}
+
 		$.get({url: url, success: function(data) {
 			window.location.href = url;
 		}});
