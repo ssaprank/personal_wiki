@@ -18,18 +18,6 @@
 	</div>
 </div>
 
-<div class="row mt-lg-3">
-	<div class="col-sm">
-		{% if pages is not None %}
-		<div class="list-group">
-			<div id="page_list">
-				{% include "./page_list.html" %}
-			</div>
-		</div>
-		{% endif %}
-	</div>
-</div>
-
 <div class="row mt-lg-3 row-eq-height">
 	<div class="col-sm mb-2" id="add_new_page_button">
 		<a href="{% url 'page:create' %}" class="badge badge-info">
@@ -51,6 +39,18 @@
 			<button class="btn btn-danger input-group-text" data-toggle="modal" data-target="#page_deletion_modal_prompt">Discard article</button>
   		</div>
   		{% endif %}
+	</div>
+</div>
+
+<div class="row mt-lg-3">
+	<div class="col-sm">
+		{% if pages is not None %}
+		<div class="list-group">
+			<div id="page_list">
+				{% include "./page_list.html" %}
+			</div>
+		</div>
+		{% endif %}
 	</div>
 </div>
 {% endblock %}

@@ -3,6 +3,7 @@
 {% load wiki_templates_extras %}
 
 {% block content %}
+<script type="text/javascript" src="{% static 'page/custom_js/show_page.js' %}"></script>
 <div class="row mt-lg-2 article_header">
 	<div class="col text-center font-weight-bold font-italic">
 		<h2>{{ page_object.title }}</h2>
@@ -35,8 +36,8 @@
 </div>
 <hr/>
 {% endif %}
-<div class=" row mt-lg-2">
-	<div class="col-sm-5">
+<div class=" row mt-lg-2" id="bottom_button_row">
+	<div class="col-sm-5" id="edit_page_button">
 		<a class="badge badge-primary p-2 link-button-normal" href="{% url 'page:edit' page_id=page_object.id %}"><img src="{% static 'page/images/pencil.png' %}"/> Edit page</a>
 	</div>
 	<div class="col-sm-5">
