@@ -39,7 +39,7 @@ a.backspace_link {
 	text-decoration: underline;
 }
 
-#add_new_page_button {
+#add_new_page_button, #add_new_snippet_button {
 	font-size: 30px;
 }
 

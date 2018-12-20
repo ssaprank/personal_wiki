@@ -71,6 +71,15 @@
                     Insert Images
                 </button>
 
+                {% if snippets.count > 0 %}
+                <select id="snippets_select" class="btn btn-warning dropdown-toggle">
+                    <option value="0">--Insert HTML Snippet--</option>
+                    {% for snippet in snippets %}
+                    <option value="{{snippet.id}}">{{snippet.title}}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+
                 <div class="col-sm-2 float-right mr-2">
                     <button type="button" id="btn_rus_to_hira" name="btn_rus_to_hira" class="btn btn-secondary mb-2">
                         Convert to Hiragana

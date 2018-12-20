@@ -201,6 +201,20 @@ $( document ).ready(function() {
         }
     });
 
+    $("#snippets_select").change(function() {
+        snippet_id = $(this).val();
+
+        $.get({
+            url: API_ENDPOINT + "get_snippet_html",
+            data: { 'snippet_id' : snippet_id },
+            success: function(data) {
+                insertHtmlSnippet(data);
+            }
+        });
+
+        $(this).val('0');
+    });
+
   /* Handling the image uploading */
     $(".js-upload-photos").click(function () {
        $("#fileupload").click();
@@ -218,6 +232,23 @@ $( document ).ready(function() {
             }
         }
     });
+
+    function insertHtmlSnippet(html)
+    {
+        let value = textarea.val();
+
+        let caretPosition = textarea.prop("selectionStart");
+        let textBefore = value.substring(0,  caretPosition );
+        let textAfter  = value.substring(caretPosition, value.length);
+
+        textarea.focus();
+        textarea.val(textBefore + html)
+
+        let newCaretPosition = caretPosition + html.length;
+
+        textarea.prop("selectionStart", newCaretPosition);
+        textarea.prop("selectionEnd", newCaretPosition);
+    }
 
     function insertTag(tag)
     {
@@ -238,10 +269,6 @@ $( document ).ready(function() {
             newCaretPosition = caretPosition + tag.length + 2;
         }
 
-
-        console.log(caretPosition)
-         
-        textarea.val(textBefore);
         textarea.focus();
         textarea.val(newValue)
 
@@ -336,6 +363,4 @@ $( document ).ready(function() {
             }
         });
     }
-
-
 });

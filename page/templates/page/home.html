@@ -19,13 +19,16 @@
 </div>
 
 <div class="row mt-lg-3 row-eq-height">
-	<div class="col-sm mb-2" id="add_new_page_button">
-		<a href="{% url 'page:create' %}" class="badge badge-info">
+	<div class="col-sm mb-2">
+		<a href="{% url 'page:create' %}" id="add_new_page_button" class="badge badge-warning">
 			<img src="{% static 'page/images/add_page.png' %}" />
 			Add new page
 		</a>
 	</div>
-	<div class="col-sm-5 mb-3 input-group">
+</div>
+
+<div class="row mt-lg-3">
+		<div class="col-sm-5 mb-3 input-group">
 		{% if wip_pages.count > 0 %}
 		<div class="input-group-prepend">
 			<button class="btn btn-info input-group-text" id="goon_wip_article">Continue writing</button>
@@ -39,6 +42,30 @@
 			<button class="btn btn-danger input-group-text" data-toggle="modal" data-target="#page_deletion_modal_prompt">Discard article</button>
   		</div>
   		{% endif %}
+	</div>
+</div>
+
+<div class="row mt-lg-3 row-eq-height">
+	<div class="col-sm-8 mb-3 input-group">
+		<div class="input-group-prepend">
+			<button class="btn btn-warning" id="add_snippet_button">
+				<img src="{% static 'page/images/add_snippet.png' %}" />
+				Add new snippet
+			</button>
+		</div>
+		{% if snippets.count > 0 %}
+		<select class="custom-select" id="snippets_select">
+			{% for snippet in snippets %}
+				<option value="{{snippet.id}}">{{snippet.title}}</option>
+			{% endfor%}
+		</select>
+		<div class="input-group-append">
+			<button class="btn btn-info input-group-text" id="edit_snippet">Edit snippet</button>
+		</div>
+		<div class="input-group-append">
+			<button class="btn btn-danger input-group-text" data-toggle="modal" data-target="#snippet_deletion_modal_prompt">Discard snippet</button>
+		</div>
+		{% endif %}
 	</div>
 </div>
 

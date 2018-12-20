@@ -58,4 +58,32 @@ $( document ).ready(function() {
 		}});
 	});
 
+	$("#modal_submit_snippet_deletion").click(function(e) {
+		let selected_snippet_id = $("#snippets_select").children("option:selected").val()
+		let url = '/delete_snippet';
+
+		$.get({url: url, data: { 'snippet_id' : selected_snippet_id }, success: function(data) {
+			window.location.href = url;
+		}});
+	});
+
+	$("#add_snippet_button").click(function(e) {
+		let url = 'api/get_snippet_form';
+
+		$.get({url: url, success: function(data) {
+			$('#snippet_creation_modal_body').html(data)
+			$("#snippet_creation_modal").modal("show");
+		}});
+	});
+
+	$("#edit_snippet").click(function(e) {
+		let selected_snippet_id = $("#snippets_select").children("option:selected").val()
+
+		let url = 'api/get_snippet_form';
+		$.post({url: url, data: {'snippet_id' : selected_snippet_id}, success: function(data) {
+			$('#snippet_creation_modal_body').html(data)
+			$("#snippet_creation_modal").modal("show");
+		}});
+	});
+
 });

@@ -1,16 +1,1 @@
-<div id="page_deletion_modal_prompt" class="modal bg-dark" role="dialog">
-  <div class="modal-dialog">
-
-    <div class="modal-content">
-      <div class="modal-header">
-        <p>Are you sure you want to delete the page for ever?</p>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <button type="button" class="btn btn-danger" id="modal_submit_page_deletion">Yes</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-      </div>
-    </div>
-
-  </div>
-</div>
+{% include "./deletion_modal_prompt.html" with type="page" %}

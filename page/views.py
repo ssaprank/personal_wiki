@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.conf import settings
 
-from .models import Article, ArticleForm, Image, ImageForm, Tag
+from .models import Article, ArticleForm, Snippet, SnippetForm, Image, ImageForm, Tag
 from .helpers import WikiStringHelper, KanaHelper
 
 HTML_TAG_ROW = ['a', 'b', 'i', 'ul', 'li', 'p', 'pre', 'code']
@@ -24,6 +24,7 @@ def index(request):
 
 	pages = Article.objects.filter(work_in_progress=False).order_by('-last_modified')[:20]
 	wip_pages = Article.objects.filter(work_in_progress=True)
+	snippets = Snippet.objects.filter(is_default=False)
 
 	for page in pages:
 		page.short_description = WikiStringHelper.get_article_short_description(
@@ -32,6 +33,7 @@ def index(request):
 			)
 
 	render_params = {"pages" : pages, 'wip_pages' : wip_pages}
+	render_params["snippets"] = snippets
 	return render(request, template_name, render_params)
 
 def show_search_list(request):
@@ -75,6 +77,8 @@ def edit_page(request, page_id):
 	render_params = {"html_tag_list" : HTML_TAG_LIST, "html_tag_row" : HTML_TAG_ROW}
 	render_params['images'] = Image.objects.all()
 	render_params['base_dir'] = settings.BASE_DIR
+	render_params['snippets'] = Snippet.objects.filter(is_default=False)
+
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST, instance=page_object)
 		hidden_tags_input = request.POST.get('hidden_page_tags_input', '')
@@ -132,6 +136,8 @@ def create_page(request):
 	render_params = {"html_tag_list" : HTML_TAG_LIST, "html_tag_row" : HTML_TAG_ROW}
 	render_params['images'] = Image.objects.all()
 	render_params['base_dir'] = settings.BASE_DIR
+	render_params['snippets'] = Snippet.objects.filter(is_default=False)
+
 	if request.method == 'POST':
 		page_form = ArticleForm(request.POST)
 
@@ -196,6 +202,77 @@ def delete_page(request, page_id): # pylint: disable=unused-argument
 		Article.objects.filter(id=page_id).delete()
 
 	return redirect('page:index')
+
+
+def get_snippet_form(request):
+	"""Returns a  SnippetForm instance that is later used for creation or editing snippet"""
+	if not request.is_ajax():
+		return redirect('page:index')
+
+	snippet_id = request.POST.get('snippet_id', '')
+	template_name = 'page/modals/snippet_creation_modal_body.html'
+
+	if not snippet_id:
+		return render(request, template_name, {'snippet_form' : SnippetForm()})
+
+	snippet_object = get_object_or_404(Snippet, id=int(snippet_id))
+	snippet_form = SnippetForm(instance=snippet_object)
+	return render(request, template_name, {'snippet_form' : snippet_form})
+
+def get_snippet_html(request):
+	if not request.is_ajax():
+		return HttpResponse('')
+
+	snippet_id = request.GET.get('snippet_id', '')
+
+	if not snippet_id:
+		return HttpResponse('')
+
+	html = Snippet.objects.filter(id=int(snippet_id)).first().html
+	return HttpResponse(html)
+
+def create_snippet(request):
+	if not request.method == 'POST':
+		return redirect('page:index')
+
+	snippet_form = SnippetForm(request.POST)
+
+	if not snippet_form.is_valid():
+		return redirect('page:index')
+
+	snippet_form.save()
+
+	return redirect('page:index')
+
+def edit_snippet(request, snippet_id):
+	if not request.method == 'POST':
+		return redirect('page:index')
+
+	snippet_object = get_object_or_404(Snippet, id=snippet_id)
+	snippet_form = SnippetForm(request.POST, instance=snippet_object)
+
+	if not snippet_form.is_valid():
+		return redirect('page:index')
+
+	snippet_form.save()
+
+	return redirect('page:index')
+
+def delete_snippet(request):
+	if not request.is_ajax():
+		return redirect('page:index')
+
+	snippet_id = request.GET.get('snippet_id', '')
+
+	if not snippet_id:
+		return redirect('page:index')
+
+	if Snippet.objects.filter(id=snippet_id).count() <= 0:
+		return redirect('page:index')
+
+	Snippet.objects.filter(id=snippet_id).delete()
+	return redirect('page:index')
+
 
 def get_page_tags(request):
 	"""

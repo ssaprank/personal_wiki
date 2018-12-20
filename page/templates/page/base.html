@@ -1,4 +1,5 @@
 {% load staticfiles %}
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -29,7 +30,9 @@
 					{% block content %}
 					{% endblock %}
 
+					{% include "./modals/snippet_creation_modal.html" %}
 					{% include "./modals/page_deletion_modal_prompt.html" %}
+					{% include "./modals/snippet_deletion_modal_prompt.html" %}
 				</div>
 			</div>
 		</div>

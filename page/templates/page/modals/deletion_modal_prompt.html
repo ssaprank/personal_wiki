@@ -1,0 +1,18 @@
+{% load wiki_templates_extras %}
+
+<div id="{{ type }}_deletion_modal_prompt" class="modal bg-dark" role="dialog">
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <p>Are you sure you want to delete the {{ type|replace_if_empty:"element" }} for ever?</p>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <button type="button" class="btn btn-danger" id="modal_submit_{{ type }}_deletion">Yes</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,30 @@
+{% if snippet_form.instance.id is not None %}
+<form method="POST" action="{% url 'page:edit_snippet' snippet_id=snippet_form.instance.id %}" id="edit_page_form">
+{% else %}
+<form method="POST" action="{% url 'page:create_snippet' %}" id="edit_page_form">
+{% endif %}
+{% csrf_token %}
+
+  <div class="row">
+    <div class="col-sm-3">
+      <pre> {{snippet_form.title.label}}:</pre>
+    </div>
+    <div class="col-sm-9">
+      {{snippet_form.title}}
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col">
+      {{snippet_form.html}}
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col">
+      <button type="submit" id="submit" name="submit" class="btn btn-primary">Save</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+    </div>
+  </div>
+
+</form>

@@ -41,6 +41,16 @@ class Tag(models.Model):
 
 		return string
 
+class Snippet(models.Model):
+	"""Represents an HTML Snippet, that can be inserted into a page"""
+	title = models.CharField(max_length=100, unique=True)
+	html = models.TextField()
+	is_default = models.BooleanField(blank=False, default=False)
+
+	def __str__(self):
+		string = "Title : '%s' " % self.title + "\n\n"
+		return string
+
 class ImageForm(ModelForm):
 	"""Represents an image form"""
 	class Meta:
@@ -60,4 +70,17 @@ class ArticleForm(ModelForm):
 		fields = ['title', 'html', 'work_in_progress']
 		labels = {
 			'html' : 'Write your Article',
+		}
+
+class SnippetForm(ModelForm):
+	"""Represents a form for Snippet model"""
+	class Meta:
+		model = Snippet
+		widgets = {
+			'html' : Textarea(attrs={'cols' : '50', 'rows' : '10', 'class' : 'form-control'}),
+			'title' : TextInput(attrs={'class' : 'form-control', 'style' : 'height: 25px; font-size:12pt;'})
+		}
+		fields = ['title', 'html']
+		labels = {
+			'html' : 'Write the html snippet here.'
 		}
